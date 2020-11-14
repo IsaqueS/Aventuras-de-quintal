@@ -13,7 +13,7 @@ public class Entity {
     public static final BufferedImage WEAPON_SPRITE = Game.spritesheet.getSprite(16*7, 0, 16, 16);
     public static final BufferedImage WEAPON_MINI_SPRITE = Game.spritesheet.getSprite(16*7, 16, 16, 16);
     public static final BufferedImage STONE_SPRITE = Game.spritesheet.getSprite(16*8, 0, 16, 16);
-    public static final BufferedImage ENEMY_SPRITE = Game.spritesheet.getSprite(0, 16, 16, 16);
+    //public static final BufferedImage ENEMY_SPRITE = Game.spritesheet.getSprite(0, 16, 16, 16);
     
     protected int width, height;
     protected double x, y;

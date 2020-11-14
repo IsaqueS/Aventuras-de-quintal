@@ -11,20 +11,25 @@ import java.awt.image.BufferedImage;
 
 public class Player extends Entity{
     
-    public boolean right, left, up, down, shoot, mouseShoot, specialAttack;
+    public boolean right, left, up, down, mouseShoot, specialAttack, jump, Game_Over;
+    private boolean jRight, jLeft,jUp, jDown;
+    public boolean isJumping = false;
     public int mouseX, mouseY;
-    public final double speed = 1.5;
-    public boolean leftDir = false, rightDir = true;
-    public boolean dir = rightDir;
+    public final double speed = 1.5, speedJump = 2.5;
+    public boolean leftDir = false, rightDir = true, dir = rightDir;
+    private int z;
     
     private static Rectangle playerBox;
-    private BufferedImage[] rightPlayer;
-    private BufferedImage[] leftPlayer;
-    private BufferedImage[] rightPlayerDamage;
-    private BufferedImage[] leftPlayerDamage;
+    private final BufferedImage[] rightPlayer;
+    private final BufferedImage[] leftPlayer;
+    private final BufferedImage[] rightPlayerDamage;
+    private final BufferedImage[] leftPlayerDamage;
+    private final BufferedImage[] rightPlayerJump;
+    private final BufferedImage[] leftPlayerJump;
     
-    private byte frames = 0, maxFrames = 6, index = 0, maxIndex = 3, damageFrames, maxDamageFrames = 4;
+    private final byte maxFrames = 6, maxIndex = 3, maxDamageFrames = 4, maxJumpFrames = 50, maxJumpIndex = 5, maxNextJFrame = maxJumpFrames / maxJumpIndex, maxJumpWait = 60;
     private boolean moved = false;
+    private byte frames = 0, index = 0, damageFrames = 0, jumpFrames = 0, jumpIndex = 0, nextJFrame = 0, jumpWait;
     
     private final int maxHP = 150;
     private int HP = maxHP;
@@ -39,15 +44,21 @@ public class Player extends Entity{
         leftPlayer =  new BufferedImage[4];
         rightPlayerDamage =  new BufferedImage[4];
         leftPlayerDamage =  new BufferedImage[4];
+        rightPlayerJump =  new BufferedImage[5];
+        leftPlayerJump =  new BufferedImage[5];
         
         setMask(3, 0, 10, 16);
-        //xCenter = maskW / 2;
-        //yCenter = maskH /2;
         rightSprites: {
             rightPlayer[0] = Game.spritesheet.getSprite(32, 0, width, height);
             rightPlayer[1] = Game.spritesheet.getSprite(48, 0, width, height);
             rightPlayer[2] = Game.spritesheet.getSprite(64, 0, width, height);
             rightPlayer[3] = Game.spritesheet.getSprite(80, 0, width, height);
+            
+            rightPlayerJump[0] = Game.spritesheet.getSprite(32, 64, width, height);
+            rightPlayerJump[1] = Game.spritesheet.getSprite(48, 64, width, height);
+            rightPlayerJump[2] = Game.spritesheet.getSprite(64, 64, width, height);
+            rightPlayerJump[3] = Game.spritesheet.getSprite(80, 64, width, height);
+            rightPlayerJump[4] = Game.spritesheet.getSprite(96, 64, width, height);
         }
         rightSpritesDamage: {
             rightPlayerDamage[0] = Game.spritesheet.getSprite(32, 32, width, height);
@@ -61,54 +72,151 @@ public class Player extends Entity{
             leftPlayer[1] = Game.spritesheet.getSprite(48, 16, width, height);
             leftPlayer[2] = Game.spritesheet.getSprite(64, 16, width, height);
             leftPlayer[3] = Game.spritesheet.getSprite(80, 16, width, height);
+            
+            leftPlayerJump[0] = Game.spritesheet.getSprite(32, 80, width, height);
+            leftPlayerJump[1] = Game.spritesheet.getSprite(48, 80, width, height);
+            leftPlayerJump[2] = Game.spritesheet.getSprite(64, 80, width, height);
+            leftPlayerJump[3] = Game.spritesheet.getSprite(80, 80, width, height);
+            leftPlayerJump[4] = Game.spritesheet.getSprite(96, 80, width, height);
         }
-        leftSprites: {
+        leftSpritesDamage: {
             leftPlayerDamage[0] = Game.spritesheet.getSprite(32, 48, width, height);
             leftPlayerDamage[1] = Game.spritesheet.getSprite(48, 48, width, height);
             leftPlayerDamage[2] = Game.spritesheet.getSprite(64, 48, width, height);
             leftPlayerDamage[3] = Game.spritesheet.getSprite(80, 48, width, height);
-        }
+        } 
+        
     }
     
+    @Override
     public void tick(){
-        
+        //System.out.println("Jump: " + jump);
+        //System.out.println("isJumping: " + isJumping);
         playerBox = new Rectangle(getX() + maskX, getY() + maskY, maskW, maskH);
         
         //Death
         if (HP <= 0) death();
         //Death
         
-        //colliding with portal
-        for (int i = 0; i < Game.portals.size(); i++){
-            PortalCoordinates p = Game.portals.get(i);
-            if (playerBox.intersects(p.getX() - 1, p.getY() -1, 2, 2)){
-                //next map
-                Game.isReadyToLoad = true;
-            }
+        if (jumpWait < maxJumpWait){
+            jumpWait++;
         }
-        //colliding with portal
         
-        //movement
-        moved = false;        
-        if (left && Maps.isFree((int)(x - speed), getY(), maskX, maskY, maskW, maskH)) {
-            x-= speed;
-            dir = leftDir;
-            moved = true;
-        }
-        if (right && Maps.isFree((int)(x + speed), getY(), maskX, maskY, maskW, maskH)){ 
-            x+= speed;
-            dir = rightDir;
-            moved = true;
-        }
-        if (up && Maps.isFree(getX(), (int)(y - speed), maskX, maskY, maskW, maskH)) {
-            y-= speed;
-            moved = true;
-        }
-        if (down && Maps.isFree(getX(), (int)(y + speed), maskX, maskY, maskW, maskH)) {
-            y+= speed;
-            moved = true;
-        }
-        //movement
+        if (jump){
+            if (isJumping == false && maxJumpWait == jumpWait){
+                jump = false;
+                isJumping = true;
+                jRight = right;
+                jLeft = left;
+                jUp = up;
+                jDown = down;
+                index = 0;
+                jumpWait = 0;
+                if (jUp == false && jDown == false && jLeft == false && jRight == false){
+                    isJumping = false;
+                }
+            } 
+            
+        }      
+        
+        if (isJumping){
+            jumpFrames++;
+            z = 1;
+            jumpFrames++;
+            if(jumpFrames >= maxNextJFrame + nextJFrame){
+                //System.out.println(nextJFrame);
+                nextJFrame += maxNextJFrame;
+                jumpIndex++;
+                if(jumpFrames >= maxJumpFrames){
+                    jumpIndex = 0;
+                    nextJFrame = 0;
+                    jumpFrames = 0;
+                    isJumping = false;
+                    jumpFrames = 0;
+                    z = 0;
+                    isJumping = false;
+                    jRight = false;
+                    jLeft = false;
+                    jUp = false;
+                    jDown = false;
+                }
+            }          
+            //jump moviment
+            if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)) {
+                x-= speedJump;
+                dir = leftDir;
+                moved = true;
+            }
+            if (jRight && Maps.isFree((int)(x + speed + 1), getY(), maskX, maskY, maskW, maskH)){ 
+                x+= speedJump;
+                dir = rightDir;
+                moved = true;
+            }
+            if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)) {
+                y-= speedJump;
+                moved = true;
+            }
+            if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)) {
+                y+= speedJump;
+                moved = true;
+            }
+        
+            //jump moviment
+            
+        } else {
+            
+            //movement            
+            moved = false;        
+            if (left && Maps.isFree((int)(x - speed), getY(), maskX, maskY, maskW, maskH)) {
+                x-= speed;
+                dir = leftDir;
+                moved = true;
+            }
+            if (right && Maps.isFree((int)(x + speed), getY(), maskX, maskY, maskW, maskH)){ 
+                x+= speed;
+                dir = rightDir;
+                moved = true;
+            }
+            if (up && Maps.isFree(getX(), (int)(y - speed), maskX, maskY, maskW, maskH)) {
+                y-= speed;
+                moved = true;
+            }
+            if (down && Maps.isFree(getX(), (int)(y + speed), maskX, maskY, maskW, maskH)) {
+                y+= speed;
+                moved = true;
+            }
+            //movement
+        
+            //attack
+            if (ammo > 0 && hasWeapon){             
+                if (mouseShoot){
+                
+                    ammo --;
+                    double angle = Math.atan2(mouseX - (getXCenter() - Camera.getX()), mouseY - (getYCenter() - Camera.getY()));               
+                
+                    double dx = Math.sin(angle);
+                    double dy = Math.cos(angle);
+
+                    StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, dy);
+                    Game.playerProjectiles.add(stone);                
+                }
+                if (ammo >= 8 && specialAttack){
+                
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, 1.0));                
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 1.0, 0.0));
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, 0.5));
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, 0.5));
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, -0.5));
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, -0.5));
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -1.0, 0));
+                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, -1.0));
+
+                    ammo-=8;
+                
+                    specialAttack = false;
+                }
+                //attack
+            }                            
         
         //animation
         if (moved){
@@ -134,47 +242,6 @@ public class Player extends Entity{
         }
         //animation
         
-        
-        //attack
-        if (ammo > 0 && hasWeapon){
-            if (shoot){
-                ammo --;
-                int dx;
-                if (dir == rightDir){
-                    dx = 1;
-                } else {
-                    dx = -1;
-                }
-                StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, 0);
-                Game.projectiles.add(stone);
-                }
-            if (mouseShoot){
-                
-                ammo --;
-                double angle = Math.atan2(mouseX - (getXCenter() - Camera.getX()), mouseY - (getYCenter() - Camera.getY()));               
-                
-                double dx = Math.sin(angle);
-                double dy = Math.cos(angle);
-
-                StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, dy);
-                Game.projectiles.add(stone);                
-            }
-            if (ammo >= 8 && specialAttack){
-                
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, 1.0));                
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 1.0, 0.0));
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, 0.5));
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, 0.5));
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, -0.5));
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, -0.5));
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -1.0, 0));
-                Game.projectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, -1.0));
-
-                ammo-=8;
-                
-                specialAttack = false;
-            }
-            //attack
         }        
         
         //Others
@@ -183,23 +250,42 @@ public class Player extends Entity{
         Camera.setX(Camera.clamp(((this.getX() + 8) - (Game.WIDTH / 2)), 0, (Maps.getWidth() * 16) - Game.WIDTH));
         Camera.setY(Camera.clamp(((this.getY() + 8) - (Game.HEIGTH / 2)), 0, (Maps.getHeight() * 16) - Game.HEIGTH));
         
-        shoot = false;
-        mouseShoot = false;
+        mouseShoot = false; 
+        
         //Others
+        //colliding with portal
+        for (int i = 0; i < Game.portals.size(); i++){
+            PortalCoordinates p = Game.portals.get(i);
+            if (playerBox.intersects(p.getX() - 1, p.getY() -1, 2, 2)){
+                //next map
+                Game.isReadyToLoad = true;
+            }
+        }
+        //colliding with portal
     }
     
+    @Override
     public void render(Graphics g){
+        //if ()
+        if (isJumping){
+            if (dir == rightDir){
+                g.drawImage(rightPlayerJump[jumpIndex], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
+            } else {
+                g.drawImage(leftPlayerJump[jumpIndex], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
+            }                      
+            return;
+        }
         if (!isDamage){
             if (dir == rightDir){
-                g.drawImage(rightPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY(), null);
+                g.drawImage(rightPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
                 if (hasWeapon){
-                    g.drawImage(Entity.WEAPON_MINI_SPRITE, getX() + 6 - Camera.getX(), getY() +2 - Camera.getY(), null);
+                    g.drawImage(Entity.WEAPON_MINI_SPRITE, getX() + 6 - Camera.getX(), getY() +2 - Camera.getY() -z, null);
                 }
             } 
             if (dir == leftDir){
-                g.drawImage(leftPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY(), null);
+                g.drawImage(leftPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
                 if (hasWeapon){
-                    g.drawImage(Entity.WEAPON_MINI_SPRITE, getX() - 6 - Camera.getX(), getY() +2 - Camera.getY(), null);
+                    g.drawImage(Entity.WEAPON_MINI_SPRITE, getX() - 6 - Camera.getX(), getY() +2 - Camera.getY() -z, null);
                 }
             }
             

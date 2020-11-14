@@ -1,9 +1,10 @@
 package com.isaque.maps;
 
-import com.isaque.Entities.Enemy;
 import com.isaque.Entities.Entity;
 import com.isaque.Entities.Hamburguer;
+import com.isaque.Entities.Spider;
 import com.isaque.Entities.Stone;
+import com.isaque.Entities.Target;
 import com.isaque.Entities.Weapon;
 import com.isaque.main.Game;
 import com.isaque.maps.Tile;
@@ -19,7 +20,7 @@ public class Maps {
     private static Tile[] tiles;
     private static int width, height;
     public static final int TILE_SIZE = 16;
-    private static int level = 1;
+    private static int level = 0;
     private final static int maxLevel = 2;
     private String path;
     private static BufferedImage map;
@@ -90,7 +91,7 @@ public class Maps {
                
         try {
             
-            map = ImageIO.read(getClass().getResource(this.path + "level_" + level + ".png"));
+            map = ImageIO.read(getClass().getResource(this.path + "map_" + level + ".png"));
             int[] pixels = new int[map.getWidth() * map.getHeight()];
             map.getRGB(0, 0, map.getWidth(), map.getHeight(), pixels, 0, map.getWidth());
             
@@ -110,9 +111,9 @@ public class Maps {
                             tiles[xx + (yy * width)] = new Wall(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_WALL);
                             break;
                         } case 0xFFFF0000 -> {
-                            //ENEMY
+                            //SPIDER
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
-                            Enemy enemy = new Enemy(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                            Spider enemy = new Spider(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                             Game.entities.add(enemy);
                             Game.enemies.add(enemy);
                             break;
@@ -120,6 +121,13 @@ public class Maps {
                             //STONE
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
                             Game.entities.add(new Stone(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE, Entity.STONE_SPRITE));
+                            break;
+                        } case 0xFFff00ff -> {
+                            //TARGET
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
+                            Target enemy = new Target(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                            Game.entities.add(enemy);
+                            Game.enemies.add(enemy);
                             break;
                         } case 0xFF00FFFF -> {
                             //HAMBURGUER

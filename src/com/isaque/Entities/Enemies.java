@@ -21,7 +21,10 @@ public class Enemies extends Entity{
     
     public boolean isCollidingWithPlayer(){
         Rectangle thisEnemyBox = getEnemyBox();
-        return thisEnemyBox.intersects(Game.player.getPlayerBox());
+        if (thisEnemyBox.intersects(Game.player.getPlayerBox()) && !Game.player.isJumping){
+            return true;
+        }
+        return false;
     }
     
     public Rectangle getEnemyBox(){
@@ -81,13 +84,13 @@ public class Enemies extends Entity{
     
     protected void CollidingWithProjectiles (int nextX, int nextY){
         Rectangle thisEnemyBox = getEnemyBox();
-        for (int i = 0; i < Game.projectiles.size(); i++){
-            Projectiles p = Game.projectiles.get(i);
+        for (int i = 0; i < Game.playerProjectiles.size(); i++){
+            Projectiles p = Game.playerProjectiles.get(i);
             Rectangle projectileBox = new Rectangle(p.getX(), p.getY(), width, height);
             if (thisEnemyBox.intersects(projectileBox)){
                 damageHP(p.getDamage());
                 this.isDamage = true;
-                Game.projectiles.remove(p);
+                Game.playerProjectiles.remove(p);
                 return;
             }
         }

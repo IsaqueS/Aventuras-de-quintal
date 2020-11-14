@@ -7,6 +7,7 @@ public class Projectiles extends Entity{
     protected double dx, dy;
     protected int distance = 60, distanceCur = 0, damage = 1;
     protected double speed;
+    //protected boolean isPlayerProjectiles;
     
     public Projectiles(int x, int y, int width, int height){
         super(x, y, width, height);

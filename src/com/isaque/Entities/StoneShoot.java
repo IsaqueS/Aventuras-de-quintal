@@ -24,11 +24,13 @@ public class StoneShoot extends Projectiles{
         y+=dy*speed;
         distanceCur++;
         if (distanceCur == distance){
-            Game.projectiles.remove(this);
+            Game.playerProjectiles.remove(this);
+            Game.enemyProjectiles.remove(this);
             return;
         }
         if (!Maps.isFree(getX(), getY(),0,0,width, height)){
-            Game.projectiles.remove(this);
+            Game.playerProjectiles.remove(this);
+            Game.enemyProjectiles.remove(this);
             return;
         }
     }

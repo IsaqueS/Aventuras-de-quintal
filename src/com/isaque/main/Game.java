@@ -43,18 +43,21 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         private final boolean wUndecorated = true;	
 	public static final String msgStart = "Game iniciado";
         public static final String msgWindow = "Aventuras de quintal";
-        private boolean isPaused = false;
+        private boolean isPaused = false, gameOver = false, skipGameOver = false;
         private boolean isRealease = true;
         public static boolean isStarted = false;
         public static boolean isReadyToLoad = false;
+        private Graphics g;
+        private BufferStrategy bs;
         
-	private static Thread thread;	
+	private Thread thread;	
 	private static boolean isRunning = true;	
-	private BufferedImage image;
+	public static BufferedImage image;
         
         public static ArrayList<Entity> entities;
         public static ArrayList<Enemies> enemies;  
-        public static ArrayList<Projectiles> projectiles;
+        public static ArrayList<Projectiles> playerProjectiles;
+        public static ArrayList<Projectiles> enemyProjectiles;
         public static ArrayList<PortalCoordinates> portals;
         
         public static Player player;      
@@ -80,12 +83,13 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             random = new Random();           
             entities = new ArrayList<Entity>();
             enemies = new ArrayList<Enemies>();
-            projectiles = new ArrayList<Projectiles>();
+            playerProjectiles = new ArrayList<Projectiles>();
+            enemyProjectiles = new ArrayList<Projectiles>();
             spritesheet = new SpriteSheet("/textures/SpriteSheet.png", "/textures/icon.png"); 
             player = new Player(0,0,16,16);
             entities.add(player);
             playerUI = new PlayerUI();
-            maps = new Maps("/level/");
+            maps = new Maps("/maps/");
             maps.loadLevel();
             pause = new Pause();
             //load   
@@ -153,18 +157,22 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                         
 			
 			if (delta >= 1) {				                            				
-				frames++;
+				g = Game.image.getGraphics();
+                                bs = this.getBufferStrategy();
+                                frames++;
 				delta--;
                                 if (!isPaused() && !isReadyToLoad){
-                                    tick(isPaused);
-                                    render(isPaused);
+                                    tick();
+                                    render();
                                 } else if (isReadyToLoad){
                                     Game.maps.nextLevel();
                                     Game.reload();
                                     isReadyToLoad = false;
-                                } else {
-                                    tick(isPaused);
-                                    render(isPaused);  
+                                } else if (isPaused){
+                                    pause.tick();
+                                    pause.render(g, bs);
+                                } else if (gameOver){
+                                    
                                 }
                                                    
 			} else {
@@ -187,54 +195,42 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	
 	}
 	
-	public void tick(boolean isActive) {
-            if (!isActive){
-                for (int i = 0; i < entities.size(); i++){
-                    Entity e = entities.get(i);
-                    e.tick();
-                }
-                for (int i = 0; i < projectiles.size(); i++){
-                    Projectiles e = projectiles.get(i);
-                    e.tick();
-                }
-            } else{
-                pause.tick();
+	public void tick() {
+            for (int i = 0; i < entities.size(); i++){
+                Entity e = entities.get(i);
+                e.tick();
             }
-            
-		
+            for (int i = 0; i < playerProjectiles.size(); i++){
+                Projectiles e = playerProjectiles.get(i);
+                e.tick();
+            }	
 	}
 	
-	public void render(boolean isAtive) {
-		
-		BufferStrategy bs = this.getBufferStrategy();
+	public void render() {
+				
 		if (bs == null) {			
 			this.createBufferStrategy(3);
 			return;
-		}
-		
-		Graphics g = image.getGraphics();		
+		}		
 
 		// Rendeliza��o do jogo
-		if(!isAtive){
-                    g.setColor(Color.WHITE);
-                    g.fillRect(0, 0,WIDTH,  HEIGTH);
+		
+                g.setColor(Color.WHITE);
+                g.fillRect(0, 0,WIDTH,  HEIGTH);
                     
-                    maps.render(g);
-                
-                    for (int i = 0; i < entities.size(); i++){
-                        Entity e = entities.get(i);
-                        e.render(g);
-                        //e.renderCollisionBox(g, Color.BLUE);
-                    }
-                    for (int i = 0; i < projectiles.size(); i++){
-                        Projectiles e = projectiles.get(i);
-                        e.render(g);
-                    }
-                
-                    playerUI.render(g);
-                } else {
-                    pause.render(g);
+                maps.render(g);
+                    
+                for (int i = 0; i < playerProjectiles.size(); i++){
+                    Projectiles e = playerProjectiles.get(i);
+                    e.render(g);
                 }
+                for (int i = 0; i < entities.size(); i++){
+                     Entity e = entities.get(i);
+                     e.render(g);
+                     //e.renderCollisionBox(g, Color.BLUE);
+                }
+                playerUI.render(g);
+                
 		// fim do render
 		
 		g.dispose();
@@ -257,7 +253,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> player.right = true;
             case KeyEvent.VK_W, KeyEvent.VK_UP -> player.up = true;
             case KeyEvent.VK_S, KeyEvent.VK_DOWN -> player.down = true;
-            case KeyEvent.VK_ENTER -> player.shoot = true;
+            case KeyEvent.VK_ENTER -> skipGameOver = true;
             case KeyEvent.VK_ESCAPE -> {
                 if (isRealease){
                     isPaused = !isPaused;
@@ -278,7 +274,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             case KeyEvent.VK_W, KeyEvent.VK_UP -> player.up = false;
             case KeyEvent.VK_S, KeyEvent.VK_DOWN -> player.down = false;
             case KeyEvent.VK_ESCAPE -> isRealease = true;
-            case KeyEvent.VK_ENTER -> player.shoot = false;
+            case KeyEvent.VK_ENTER -> skipGameOver = false;
         }
     }
     
@@ -332,6 +328,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                     player.mouseY = (int) (e.getYOnScreen() / SCALE_H);
                 } 
                 case MouseEvent.BUTTON2 -> player.specialAttack = true;
+                case MouseEvent.BUTTON3 -> player.jump = true;
             }
         }        
 
@@ -342,6 +339,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         switch (e.getButton()){
             case MouseEvent.BUTTON1 -> player.mouseShoot = false;
             case MouseEvent.BUTTON2 -> player.specialAttack = false;
+            case MouseEvent.BUTTON3 -> player.jump = false;
         }      
     }
 
@@ -369,7 +367,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             portals = new ArrayList<PortalCoordinates>();           
             entities = new ArrayList<Entity>();
             enemies = new ArrayList<Enemies>();
-            projectiles = new ArrayList<Projectiles>();
+            playerProjectiles = new ArrayList<Projectiles>();
+            enemyProjectiles = new ArrayList<Projectiles>();
             player = new Player(0,0,16,16);
             entities.add(player);
             Game.maps.loadLevel();

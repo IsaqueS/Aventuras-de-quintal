@@ -4,9 +4,12 @@ import com.isaque.Entities.Enemies;
 import com.isaque.Entities.Entity;
 import com.isaque.Entities.Player;
 import com.isaque.Entities.Projectiles;
+import com.isaque.Graphics.GameOver;
+import com.isaque.Graphics.Menu;
 import com.isaque.Graphics.Pause;
 import com.isaque.Graphics.SpriteSheet;
 import com.isaque.Graphics.PlayerUI;
+import com.isaque.maps.Camera;
 import com.isaque.maps.Maps;
 import com.isaque.maps.PortalCoordinates;
 import java.awt.Canvas;
@@ -20,8 +23,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
 
 public class Game extends Canvas implements Runnable, KeyListener, MouseListener{
@@ -43,10 +49,11 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         private final boolean wUndecorated = true;	
 	public static final String msgStart = "Game iniciado";
         public static final String msgWindow = "Aventuras de quintal";
-        private boolean isPaused = false, gameOver = false, skipGameOver = false;
-        private boolean isRealease = true;
+        public static boolean isPaused = false;
+        private boolean isRealease = true, isLoaded = false;
         public static boolean isStarted = false;
-        public static boolean isReadyToLoad = false;
+        public static boolean isReadyToLoad = false, skip = false, isGameOver = false, isActive = false, isOnMenu = false;
+        private byte ticksBeforeLoad = 0;
         private Graphics g;
         private BufferStrategy bs;
         
@@ -66,6 +73,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         public static Random random;
         public static PlayerUI playerUI;
         public static Pause pause;
+        public static GameOver gameOver;
+        public static Menu menu;
 	
 	public Game() {            
             /*resolutionSettings: {
@@ -92,6 +101,9 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             maps = new Maps("/maps/");
             maps.loadLevel();
             pause = new Pause();
+            gameOver = new GameOver();
+            menu = new Menu();       
+            Sound.music.loop();
             //load   
             addKeyListener(this);
             addMouseListener(this);
@@ -128,14 +140,13 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
 		System.out.println(msgStart);
 		Game game = new Game();
-		game.start();
-		
-		
+		game.start();				
 	}
 	
+        @Override
 	public void run() {
 		
 		long lastLoopTime = System.nanoTime();
@@ -144,37 +155,53 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 		double delta = 0;		
 		int frames = 0;
 		double timer = System.currentTimeMillis();
-                long now;
-
+                long now;                            
+                
                 startFrame();
                 requestFocus();
-                                
+
 		while (isRunning) {
-			
 			now = System.nanoTime();
 			delta += (now - lastLoopTime) / (double)ns;
-			lastLoopTime = now;
-                        
+			lastLoopTime = now;                      
 			
 			if (delta >= 1) {				                            				
 				g = Game.image.getGraphics();
+                                if (bs == null) {			
+                                    this.createBufferStrategy(3);
+                                    //return;
+                                }
                                 bs = this.getBufferStrategy();
                                 frames++;
 				delta--;
-                                if (!isPaused() && !isReadyToLoad){
+                    
+                                if (isActive && !isPaused()){
                                     tick();
                                     render();
-                                } else if (isReadyToLoad){
-                                    Game.maps.nextLevel();
+                                } else if (isReadyToLoad){                                   
+                                    Game.loadGame();
                                     Game.reload();
-                                    isReadyToLoad = false;
                                 } else if (isPaused){
                                     pause.tick();
                                     pause.render(g, bs);
-                                } else if (gameOver){
-                                    
+                                } else if (isGameOver){
+                                    gameOver.tick();
+                                    gameOver.render(g, bs);
+                                } else if (isOnMenu){
+                                    menu.tick();
+                                    menu.render(g, bs);
                                 }
-                                                   
+                                if (!isLoaded){
+                                    ticksBeforeLoad++;
+                                    if(ticksBeforeLoad > 1){                                       
+                                        Camera.setX(Camera.clamp(((Game.player.getX() + 8) - (Game.WIDTH / 2)), 0, (Maps.getWidth() * 16) - Game.WIDTH));
+                                        Camera.setY(Camera.clamp(((Game.player.getY() + 8) - (Game.HEIGTH / 2)), 0, (Maps.getHeight() * 16) - Game.HEIGTH));
+                                        render();
+                                        isLoaded = true;
+                                        Game.startMenu();
+                                    }
+                                }                                
+                                                 
 			} else {
                            try {
                                 Thread.sleep((lastLoopTime - System.nanoTime() + ns) / 10000000);
@@ -182,13 +209,13 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                                 ex.printStackTrace();
                             }
                         }
-			
+			/*
 			if (System.currentTimeMillis() - timer >= 1000) {
 				System.out.println("FPS: "+frames);
-				frames = 0;
+			  	frames = 0;
 				timer+=1000;
 			}
-			
+			*/
 		}
 			stop();
 		
@@ -212,7 +239,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 			this.createBufferStrategy(3);
 			return;
 		}		
-
+                
 		// Rendeliza��o do jogo
 		
                 g.setColor(Color.WHITE);
@@ -251,12 +278,23 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         switch (e.getKeyCode()){
             case KeyEvent.VK_A, KeyEvent.VK_LEFT -> player.left = true;
             case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> player.right = true;
-            case KeyEvent.VK_W, KeyEvent.VK_UP -> player.up = true;
-            case KeyEvent.VK_S, KeyEvent.VK_DOWN -> player.down = true;
-            case KeyEvent.VK_ENTER -> skipGameOver = true;
+            case KeyEvent.VK_W, KeyEvent.VK_UP -> {
+                player.up = true;
+                menu.up = true;
+            }    
+            case KeyEvent.VK_S, KeyEvent.VK_DOWN -> {
+                player.down = true;
+                menu.down = true;
+            }
+            case KeyEvent.VK_ENTER -> skip = true;
             case KeyEvent.VK_ESCAPE -> {
                 if (isRealease){
                     isPaused = !isPaused;
+                    if (isPaused == true){
+                        isActive = false;
+                    } else {
+                        isActive = true;
+                    }
                 }
                 isRealease = false;
             }
@@ -274,7 +312,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             case KeyEvent.VK_W, KeyEvent.VK_UP -> player.up = false;
             case KeyEvent.VK_S, KeyEvent.VK_DOWN -> player.down = false;
             case KeyEvent.VK_ESCAPE -> isRealease = true;
-            case KeyEvent.VK_ENTER -> skipGameOver = false;
+            case KeyEvent.VK_ENTER -> skip = false;
         }
     }
     
@@ -356,11 +394,43 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
     private boolean isPaused(){
         if (!this.isFocusOwner() && isStarted){
             isPaused = true;
+            Game.isActive = false;
+            Game.isReadyToLoad = false;
+            Game.isGameOver = false;
+            Game.isOnMenu = false;
             return true;
         }
-        return isPaused;    
+        return false;    
     }
     
+    private static void startMenu(){
+        Game.isActive = false;
+        Game.isReadyToLoad = false;
+        Game.isGameOver = false;
+        Game.isOnMenu = true;
+        Game.isPaused = false;
+    }
+    public static void startGameOver(){
+        Game.isActive = false;
+        Game.isReadyToLoad = false;
+        Game.isGameOver = true;
+        Game.isOnMenu = false;
+        Game.isPaused = false;
+    }
+    public static void resetGame(){
+        Game.isActive = false;
+        Game.isReadyToLoad = true;
+        Game.isGameOver = false;
+        Game.isOnMenu = false;
+        Game.isPaused = false;
+    }
+    public static void loadGame(){
+        Game.isActive = true;
+        Game.isReadyToLoad = false;
+        Game.isGameOver = false;
+        Game.isOnMenu = false;
+        Game.isPaused = false;
+    }
     public static void reload(){
             //load
             //Thread.sleep(1000);

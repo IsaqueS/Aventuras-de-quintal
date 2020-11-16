@@ -1,6 +1,7 @@
 package com.isaque.Entities;
 
 import com.isaque.main.Game;
+import com.isaque.main.Sound;
 import java.awt.image.BufferedImage;
 
 
@@ -14,5 +15,6 @@ public class Weapon extends Itens{
     @Override
     public void Collected(){
         Game.player.weaponCollected();
+        Sound.pickWeapon.play();
     }
 }

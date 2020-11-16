@@ -1,5 +1,6 @@
 package com.isaque.Entities;
 import com.isaque.main.Game;
+import com.isaque.main.Sound;
 import com.isaque.maps.Camera;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -19,6 +20,7 @@ public class Spider extends Enemies{
     
     private final int damageFix = 10, bonusRandom = 5;
     private int attackDelayMax = 60, attackDelay = 0;
+    private boolean lastFrame = false;
     
     
     public Spider(double x, double y, int width, int height) {
@@ -33,6 +35,9 @@ public class Spider extends Enemies{
     
     @Override
     public void tick(){
+        if (lastFrame){
+            dead();
+        }
         
         //dir = dirUp;
         moved = false;
@@ -80,6 +85,7 @@ public class Spider extends Enemies{
                 Game.player.damageHP(damage);
                 Game.player.resetDamageAnimation();
                 attackDelay++;
+                Sound.hitt.play();
            
             } else {
                 attackDelay++;
@@ -108,7 +114,7 @@ public class Spider extends Enemies{
         }
         
         if (this.HP <= 0) {
-            dead();
+            lastFrame = true;
         }
         
     }

@@ -1,5 +1,6 @@
 package com.isaque.Entities;
 
+import com.isaque.main.Sound;
 import java.awt.image.BufferedImage;
 
 
@@ -8,6 +9,6 @@ public class Itens extends Entity{
         super(x, y, width, height, sprite);
     }
     public void Collected(){
-        
+        Sound.pickIten.play();
     }
 }

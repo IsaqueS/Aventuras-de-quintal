@@ -1,6 +1,7 @@
 package com.isaque.Entities;
 
 import com.isaque.main.Game;
+import com.isaque.main.Sound;
 import com.isaque.maps.Camera;
 import com.isaque.maps.Maps;
 import com.isaque.maps.PortalCoordinates;
@@ -27,7 +28,7 @@ public class Player extends Entity{
     private final BufferedImage[] rightPlayerJump;
     private final BufferedImage[] leftPlayerJump;
     
-    private final byte maxFrames = 6, maxIndex = 3, maxDamageFrames = 4, maxJumpFrames = 50, maxJumpIndex = 5, maxNextJFrame = maxJumpFrames / maxJumpIndex, maxJumpWait = 60;
+    private final byte maxFrames = 6, maxIndex = 3, maxDamageFrames = 4, maxJumpFrames = 30, maxJumpIndex = 5, maxNextJFrame = maxJumpFrames / maxJumpIndex, maxJumpWait = 60;
     private boolean moved = false;
     private byte frames = 0, index = 0, damageFrames = 0, jumpFrames = 0, jumpIndex = 0, nextJFrame = 0, jumpWait;
     
@@ -37,7 +38,7 @@ public class Player extends Entity{
     private boolean hasWeapon = false;
     private boolean isDamage = false;
     
-    public Player(int x, int y, int width, int height) {
+    public Player(int x, int y, int width, int height) {     
         super(x, y, width, height);
         
         rightPlayer =  new BufferedImage[4];
@@ -84,7 +85,7 @@ public class Player extends Entity{
             leftPlayerDamage[1] = Game.spritesheet.getSprite(48, 48, width, height);
             leftPlayerDamage[2] = Game.spritesheet.getSprite(64, 48, width, height);
             leftPlayerDamage[3] = Game.spritesheet.getSprite(80, 48, width, height);
-        } 
+        }        
         
     }
     
@@ -104,25 +105,35 @@ public class Player extends Entity{
         
         if (jump){
             if (isJumping == false && maxJumpWait == jumpWait){
-                jump = false;
-                isJumping = true;
                 jRight = right;
                 jLeft = left;
                 jUp = up;
-                jDown = down;
-                index = 0;
+                jDown = down;               
                 jumpWait = 0;
                 if (jUp == false && jDown == false && jLeft == false && jRight == false){
                     isJumping = false;
+                    //index = 0;
+                }
+                else if (jUp == true && jDown == true && jLeft == false && jRight == false){
+                    isJumping = false;
+                    //index = 0;
+                }
+                else if (jLeft == true && jRight == true && jUp == false && jDown == false ){
+                    isJumping = false;
+                    //index = 0;
+                } else {
+                    Sound.jump.play();
+                    jump = false;
+                    isJumping = true;
+                    z = 1;
                 }
             } 
             
         }      
         
-        if (isJumping){
+        if (isJumping){                     
             jumpFrames++;
-            z = 1;
-            jumpFrames++;
+            isDamage = false;
             if(jumpFrames >= maxNextJFrame + nextJFrame){
                 //System.out.println(nextJFrame);
                 nextJFrame += maxNextJFrame;
@@ -141,30 +152,28 @@ public class Player extends Entity{
                     jDown = false;
                 }
             }          
-            //jump moviment
-            if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)) {
-                x-= speedJump;
-                dir = leftDir;
-                moved = true;
-            }
+            //jump moviment           
             if (jRight && Maps.isFree((int)(x + speed + 1), getY(), maskX, maskY, maskW, maskH)){ 
                 x+= speedJump;
                 dir = rightDir;
+                moved = true;
+            }
+            else if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)) {
+                x-= speedJump;
+                dir = leftDir;
                 moved = true;
             }
             if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)) {
                 y-= speedJump;
                 moved = true;
             }
-            if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)) {
+            else if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)) {
                 y+= speedJump;
                 moved = true;
-            }
-        
+            }      
             //jump moviment
             
-        } else {
-            
+        } else {      
             //movement            
             moved = false;        
             if (left && Maps.isFree((int)(x - speed), getY(), maskX, maskY, maskW, maskH)) {
@@ -198,10 +207,12 @@ public class Player extends Entity{
                     double dy = Math.cos(angle);
 
                     StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, dy);
-                    Game.playerProjectiles.add(stone);                
+                    Game.playerProjectiles.add(stone);       
+                    Sound.shoot.play();
                 }
                 if (ammo >= 8 && specialAttack){
-                
+                     
+                    Sound.specialAttack.play();
                     Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, 1.0));                
                     Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 1.0, 0.0));
                     Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, 0.5));
@@ -210,7 +221,6 @@ public class Player extends Entity{
                     Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, -0.5));
                     Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -1.0, 0));
                     Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, -1.0));
-
                     ammo-=8;
                 
                     specialAttack = false;
@@ -258,7 +268,8 @@ public class Player extends Entity{
             PortalCoordinates p = Game.portals.get(i);
             if (playerBox.intersects(p.getX() - 1, p.getY() -1, 2, 2)){
                 //next map
-                Game.isReadyToLoad = true;
+                Game.maps.nextLevel();
+                Game.resetGame();
             }
         }
         //colliding with portal
@@ -334,6 +345,9 @@ public class Player extends Entity{
     public void damageHP(int HP){
         this.HP -= HP;
         this.isDamage = true;
+        if (this.HP < 0){
+            this.HP = 0;
+        }
     }
     public void healHP (int HP){
         this.HP += HP;
@@ -348,8 +362,8 @@ public class Player extends Entity{
     }
     
     private void death(){
-        //Game.stop();
-        new Game();
+        //new Game();
+        Game.startGameOver();
     }
     
     public void resetHP(){
@@ -373,5 +387,8 @@ public class Player extends Entity{
     }
     public void resetDamageAnimation(){
         this.damageFrames = 0;
+    }
+    public int getZ(){
+        return this.z;
     }
 }

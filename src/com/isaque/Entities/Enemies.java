@@ -1,6 +1,7 @@
 package com.isaque.Entities;
 
 import com.isaque.main.Game;
+import com.isaque.main.Sound;
 import com.isaque.maps.Maps;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -88,6 +89,7 @@ public class Enemies extends Entity{
             Projectiles p = Game.playerProjectiles.get(i);
             Rectangle projectileBox = new Rectangle(p.getX(), p.getY(), width, height);
             if (thisEnemyBox.intersects(projectileBox)){
+                Sound.hitt.play();
                 damageHP(p.getDamage());
                 this.isDamage = true;
                 Game.playerProjectiles.remove(p);

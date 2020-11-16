@@ -79,7 +79,27 @@ public class Maps {
                 (tiles[x1 + (y2* Maps.width)] instanceof Wall) ||
                 (tiles[x2 + (y1* Maps.width)] instanceof Wall));
     }
-    
+    /*
+    public static boolean isFreePlayer(int x, int y, int maskX, int maskY, int maskW, int maskH){
+        int x1 = ((x + maskX) / TILE_SIZE);
+        int y1 = ((y + maskY)  / TILE_SIZE);
+        
+        int x2 = (x + (maskW) + maskX - 1) / TILE_SIZE;
+        int y2 = (y + (maskH) + maskY - 1) / TILE_SIZE;
+        
+        if (!((tiles[x1 + (y1* Maps.width)] instanceof Wall) ||
+                (tiles[x2 + (y2* Maps.width)] instanceof Wall) ||
+                (tiles[x1 + (y2* Maps.width)] instanceof Wall) ||
+                (tiles[x2 + (y1* Maps.width)] instanceof Wall))){
+            return true;
+        }
+        
+        if (Game.player.getZ() > 0){
+            return true;
+        }      
+        return false;
+    }
+    */
     public void nextLevel(){
         level++;
         if (level > maxLevel){

@@ -1,7 +1,10 @@
 package com.isaque.Entities;
 import com.isaque.main.Game;
 import com.isaque.main.Sound;
+import com.isaque.maps.AStar;
 import com.isaque.maps.Camera;
+import com.isaque.maps.Maps;
+import com.isaque.maps.Vector2i;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -39,7 +42,6 @@ public class Spider extends Enemies{
             dead();
         }
         
-        //dir = dirUp;
         moved = false;
         
         
@@ -47,7 +49,9 @@ public class Spider extends Enemies{
         if (!isCollidingWithPlayer()){
         
         attackDelay = 0;
-            
+        
+        //movement
+        /*
         if (getX() < Game.player.getX() && canMove(x,y,true,false)){
             x+=speed;
             moved = true;
@@ -62,8 +66,16 @@ public class Spider extends Enemies{
             y+=speed;
             moved = true;
             dir = dirDown;
-        } 
-    
+        }*/
+        
+        if (path == null || path.size() == 0){
+            Vector2i start = new Vector2i((int)(x / Maps.TILE_SIZE), (int)(y / Maps.TILE_SIZE));
+            Vector2i end = new Vector2i((int)(Game.player.getAccurateX() / Maps.TILE_SIZE), (int)(Game.player.getAccurateY() / Maps.TILE_SIZE));
+            path = AStar.findPath(Game.maps, start, end);
+        }
+        followPath(path);
+        //movement
+        
         if (moved){
             frames++;
             if (frames > maxFrames){

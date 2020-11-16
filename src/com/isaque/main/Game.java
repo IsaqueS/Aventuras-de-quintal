@@ -225,6 +225,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	public void tick() {
             for (int i = 0; i < entities.size(); i++){
                 Entity e = entities.get(i);
+                //System.out.println(e);
                 e.tick();
             }
             for (int i = 0; i < playerProjectiles.size(); i++){

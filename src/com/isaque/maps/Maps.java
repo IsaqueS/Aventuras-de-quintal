@@ -7,7 +7,6 @@ import com.isaque.Entities.Stone;
 import com.isaque.Entities.Target;
 import com.isaque.Entities.Weapon;
 import com.isaque.main.Game;
-import com.isaque.maps.Tile;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -106,6 +105,9 @@ public class Maps {
             level = 1;
         }
     }
+    public static Tile getTile(int n){
+        return tiles[n];
+    }
     
     public void loadLevel(){
                
@@ -182,7 +184,5 @@ public class Maps {
         } catch (IOException ex) {
             Logger.getLogger(Maps.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
-    
+    }  
 }

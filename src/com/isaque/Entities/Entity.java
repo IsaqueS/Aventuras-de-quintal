@@ -2,10 +2,14 @@ package com.isaque.Entities;
 
 import com.isaque.main.Game;
 import com.isaque.maps.Camera;
+import com.isaque.maps.Maps;
+import com.isaque.maps.Node;
+import com.isaque.maps.Vector2i;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 public class Entity {
     
@@ -16,9 +20,10 @@ public class Entity {
     //public static final BufferedImage ENEMY_SPRITE = Game.spritesheet.getSprite(0, 16, 16, 16);
     
     protected int width, height;
-    protected double x, y;
+    protected double x, y, speed;
     protected int maskX, maskY, maskW, maskH;
     protected BufferedImage sprite;
+    protected List<Node> path;
     
     public Entity(double x, double y, int width, int height, BufferedImage sprite){
         this.x = x;
@@ -120,6 +125,29 @@ public class Entity {
     }
     public int getMaskH(){
         return this.maskH;
+    }
+    
+    public void followPath(List<Node> path){
+        if (path != null){
+            if (path.size() > 0){
+                Vector2i target = path.get(path.size() - 1).tile;
+                //double xPrev = x;
+                //double yPrev = y;
+                if (x < target.x * Maps.TILE_SIZE){
+                    x += speed;
+                } else if (x > target.x * Maps.TILE_SIZE){
+                    x -= speed;
+                }
+                if (y < target.y * Maps.TILE_SIZE){
+                    y += speed;
+                } else if (y > target.y * Maps.TILE_SIZE){
+                    y -= speed;
+                }
+                if (x == target.x * Maps.TILE_SIZE && y == target.y * Maps.TILE_SIZE){
+                    path.remove(path.size() - 1);
+                }
+            }
+        }
     }
 }
 

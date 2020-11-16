@@ -16,7 +16,7 @@ public class Player extends Entity{
     private boolean jRight, jLeft,jUp, jDown;
     public boolean isJumping = false;
     public int mouseX, mouseY;
-    public final double speed = 1.5, speedJump = 2.5;
+    public final double speedJump = 2.5;
     public boolean leftDir = false, rightDir = true, dir = rightDir;
     private int z;
     
@@ -40,6 +40,8 @@ public class Player extends Entity{
     
     public Player(int x, int y, int width, int height) {     
         super(x, y, width, height);
+        
+        this.speed = 1.5;
         
         rightPlayer =  new BufferedImage[4];
         leftPlayer =  new BufferedImage[4];

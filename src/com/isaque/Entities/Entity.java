@@ -127,27 +127,8 @@ public class Entity {
         return this.maskH;
     }
     
-    public void followPath(List<Node> path){
-        if (path != null){
-            if (path.size() > 0){
-                Vector2i target = path.get(path.size() - 1).tile;
-                //double xPrev = x;
-                //double yPrev = y;
-                if (x < target.x * Maps.TILE_SIZE){
-                    x += speed;
-                } else if (x > target.x * Maps.TILE_SIZE){
-                    x -= speed;
-                }
-                if (y < target.y * Maps.TILE_SIZE){
-                    y += speed;
-                } else if (y > target.y * Maps.TILE_SIZE){
-                    y -= speed;
-                }
-                if (x == target.x * Maps.TILE_SIZE && y == target.y * Maps.TILE_SIZE){
-                    path.remove(path.size() - 1);
-                }
-            }
-        }
+    public double canGo(int x1, int y1, int x2, int y2){
+        return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)); 
     }
 }
 

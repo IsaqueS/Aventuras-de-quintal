@@ -32,7 +32,7 @@ public class Player extends Entity{
     private boolean moved = false;
     private byte frames = 0, index = 0, damageFrames = 0, jumpFrames = 0, jumpIndex = 0, nextJFrame = 0, jumpWait;
     
-    private final int maxHP = 150;
+    private final int maxHP = 15000;
     private int HP = maxHP;
     private int ammo;
     private boolean hasWeapon = false;

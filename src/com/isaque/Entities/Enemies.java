@@ -3,8 +3,11 @@ package com.isaque.Entities;
 import com.isaque.main.Game;
 import com.isaque.main.Sound;
 import com.isaque.maps.Maps;
+import com.isaque.maps.Node;
+import com.isaque.maps.Vector2i;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 public class Enemies extends Entity{
     
@@ -43,6 +46,12 @@ public class Enemies extends Entity{
             }
         }
                     
+        return false;
+    }
+    public boolean canGo(int x1, int y1, int x2, int y2, double maxDistance){
+        if (Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) < maxDistance){
+            return true;
+        }
         return false;
     }
     
@@ -122,5 +131,26 @@ public class Enemies extends Entity{
     protected void dead(){
         deleteSelf();
         return;
+    }
+       
+    public void followPath(List<Node> path, double spd, double maxPathDistence){
+        if (path != null){
+            if (path.size() > 0  && path.size() < maxPathDistence  &&  canGo(getX(), getY(), Game.player.getX(), Game.player.getY(), 128)){
+                Vector2i target = path.get(path.size() - 1).tile;
+                if (x < target.x * Maps.TILE_SIZE && !isCollidingWithOtherEnemy((int) (this.getAccurateX() +spd), this.getY())){
+                    x += spd;
+                } else if (x > target.x * Maps.TILE_SIZE && !isCollidingWithOtherEnemy((int) (getAccurateX() -spd), this.getY())){
+                    x -= spd;
+                }
+                if (y < target.y * Maps.TILE_SIZE && !isCollidingWithOtherEnemy(getX(), (int) (this.getAccurateY() + spd))){
+                    y += spd;
+                } else if (y > target.y * Maps.TILE_SIZE && !isCollidingWithOtherEnemy(getX(), (int) (this.getAccurateY() - spd))){
+                    y -= spd;
+                }
+                if (x == target.x * Maps.TILE_SIZE && y == target.y * Maps.TILE_SIZE){
+                    path.remove(path.size() - 1);
+                }
+            }
+        }
     }
 }

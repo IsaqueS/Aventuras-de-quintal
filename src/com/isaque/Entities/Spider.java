@@ -21,6 +21,7 @@ public class Spider extends Enemies{
     private static final BufferedImage[] spritesUpDamage = {Game.spritesheet.getSprite(0, 64, 16, 16), Game.spritesheet.getSprite(16, 64, 16, 16)};
     private static final BufferedImage[] spritesDownDamage = {Game.spritesheet.getSprite(0, 80, 16, 16), Game.spritesheet.getSprite(16, 80, 16, 16)};
     
+    private byte waitForFindPath = 0;
     private final int damageFix = 10, bonusRandom = 5;
     private int attackDelayMax = 60, attackDelay = 0;
     private boolean lastFrame = false;
@@ -29,7 +30,7 @@ public class Spider extends Enemies{
     public Spider(double x, double y, int width, int height) {
         super(x, y, width, height);
         setMask(2,3,12,11);
-        this.speed = 0.8;
+        this.speed = 1;
         maxHP = 20;
         HP = maxHP;
         damage = damageFix;
@@ -68,14 +69,20 @@ public class Spider extends Enemies{
             dir = dirDown;
         }*/
         
-        if (path == null || path.size() == 0){
-            Vector2i start = new Vector2i((int)(x / Maps.TILE_SIZE), (int)(y / Maps.TILE_SIZE));
-            Vector2i end = new Vector2i((int)(Game.player.getAccurateX() / Maps.TILE_SIZE), (int)(Game.player.getAccurateY() / Maps.TILE_SIZE));
-            path = AStar.findPath(Game.maps, start, end);
+        this.waitForFindPath++;
+        if (!isCollidingWithPlayer()){
+            if ((waitForFindPath > 30 || path == null || path.size() == 0)){
+                Vector2i start = new Vector2i((int)(x / Maps.TILE_SIZE), (int)(y / Maps.TILE_SIZE));
+                Vector2i end = new Vector2i((int)(Game.player.getXCenter() / Maps.TILE_SIZE), (int)(Game.player.getYCenter() / Maps.TILE_SIZE));
+                path = AStar.findPath(Game.maps, start, end);
+                this.waitForFindPath = 0;
+            }     
+        } else {
+            this.waitForFindPath = 0;
         }
-        followPath(path);
-        //movement
+        followPath(path, speed, 16);
         
+        //movement
         if (moved){
             frames++;
             if (frames > maxFrames){

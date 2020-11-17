@@ -209,13 +209,13 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                                 ex.printStackTrace();
                             }
                         }
-			/*
+			
 			if (System.currentTimeMillis() - timer >= 1000) {
 				System.out.println("FPS: "+frames);
 			  	frames = 0;
 				timer+=1000;
 			}
-			*/
+			
 		}
 			stop();
 		
@@ -257,6 +257,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                      e.render(g);
                      //e.renderCollisionBox(g, Color.BLUE);
                 }
+                
                 playerUI.render(g);
                 
 		// fim do render

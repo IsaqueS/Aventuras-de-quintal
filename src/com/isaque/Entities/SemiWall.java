@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 
-public class Target extends Enemies{
+public class SemiWall extends Enemies{
     
     private byte frames, maxFrames = 5, index, maxIndex = 1, damageFrames, maxDamageFrames = 5;
     private boolean moved = false;
@@ -16,11 +16,11 @@ public class Target extends Enemies{
     //private int attackDelayMax = 60, attackDelay = 0;
     
     
-    public Target(double x, double y, int width, int height) {
+    public SemiWall(double x, double y, int width, int height) {
         super(x, y, width, height);
         setMask(0,0,16,16);
         this.speed = 0.8;
-        maxHP = 50;
+        maxHP = 30;
         HP = maxHP;
         //damage = damageFix;
         isDamage = false;

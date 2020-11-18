@@ -2,6 +2,7 @@ package com.isaque.Entities;
 
 import com.isaque.main.Game;
 import com.isaque.main.Sound;
+import com.isaque.maps.AStar;
 import com.isaque.maps.Maps;
 import com.isaque.maps.Node;
 import com.isaque.maps.Vector2i;
@@ -14,6 +15,7 @@ public class Enemies extends Entity{
     public double speed = 0.5;
     protected int maxHP = 10, HP = maxHP, damage = 1;
     protected boolean isDamage;
+    private byte waitForFindPath = 0;
     
     
     public Enemies(double x, double y, int width, int height) {
@@ -40,7 +42,7 @@ public class Enemies extends Entity{
         for (int i = 0; i < Game.enemies.size(); i++){
             Enemies e = Game.enemies.get(i);
             if (this == e) continue;
-            Rectangle otherEnemyBox = new Rectangle(e.getX() + maskX, e.getY() + maskY, maskW, maskH);
+            Rectangle otherEnemyBox = new Rectangle(e.getX() + e.getMaskX(), e.getY() + e.getMaskY(), e.getMaskW(), e.getMaskH());
             if (thisEnemyBox.intersects(otherEnemyBox)){
                 return true;
             }
@@ -55,35 +57,35 @@ public class Enemies extends Entity{
         return false;
     }
     
-    public boolean canMove(double nextX, double nextY, boolean isX, boolean isNegative){
+    public boolean canMove(double nextX, double nextY, boolean isX, boolean isNegative, double spd){
         
         boolean isFree, isColliding;
         
         if (isX){
             if (isNegative) {
-                isFree = Maps.isFree((int)(nextX - speed), (int)(nextY),maskX, maskY, maskW, maskH);
+                isFree = Maps.isFree((int)(nextX - spd - 1), (int)(nextY), this.getMaskX(), this.getMaskY(), this.getWidth(), this.getMaskH());
             } else {
-                isFree = Maps.isFree((int)(nextX + speed), (int)(nextY),maskX, maskY, maskW, maskH);
+                isFree = Maps.isFree((int)(nextX + spd + 1), (int)(nextY),this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
             }
         } else {
             if (isNegative) {
-                isFree = Maps.isFree((int)(nextX), (int)(nextY - speed),maskX, maskY, maskW, maskH);
+                isFree = Maps.isFree((int)(nextX), (int)(nextY - spd - 1), this.getMaskH(), this.getMaskY(), this.getMaskW(), this.getMaskH());
             } else {
-                isFree = Maps.isFree((int)(nextX), (int)(nextY + speed),maskX, maskY, maskW, maskH);
+                isFree = Maps.isFree((int)(nextX), (int)(nextY + spd + 1),this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
             }
         }
         
         if (isX){
             if (isNegative) {
-                isColliding = isCollidingWithOtherEnemy((int)(nextX - speed), (int)(nextY));
+                isColliding = isCollidingWithOtherEnemy((int)(nextX - spd), (int)(nextY));
             } else {
-                isColliding = isCollidingWithOtherEnemy((int)(nextX + speed), (int)(nextY));
+                isColliding = isCollidingWithOtherEnemy((int)(nextX + spd), (int)(nextY));
             }
         } else {
             if (isNegative) {
-                isColliding = isCollidingWithOtherEnemy((int)(nextX), (int)(nextY - speed));
+                isColliding = isCollidingWithOtherEnemy((int)(nextX), (int)(nextY - spd));
             } else {
-                isColliding = isCollidingWithOtherEnemy((int)(nextX), (int)(nextY + speed));
+                isColliding = isCollidingWithOtherEnemy((int)(nextX), (int)(nextY + spd));
             }
         }
         
@@ -135,22 +137,48 @@ public class Enemies extends Entity{
        
     public void followPath(List<Node> path, double spd, double maxPathDistence){
         if (path != null){
-            if (path.size() > 0  && path.size() < maxPathDistence  &&  canGo(getX(), getY(), Game.player.getX(), Game.player.getY(), 128)){
+            if (path.size() > 0  && path.size() < maxPathDistence){
                 Vector2i target = path.get(path.size() - 1).tile;
-                if (x < target.x * Maps.TILE_SIZE && !isCollidingWithOtherEnemy((int) (this.getAccurateX() +spd), this.getY())){
+                if (x < target.x * Maps.TILE_SIZE && canMove(x, y, true, false, spd)){
                     x += spd;
-                } else if (x > target.x * Maps.TILE_SIZE && !isCollidingWithOtherEnemy((int) (getAccurateX() -spd), this.getY())){
+                    if(x > target.x * Maps.TILE_SIZE){
+                    x = target.x * Maps.TILE_SIZE;
+                    }
+                } else if (x > target.x * Maps.TILE_SIZE && canMove(x, y, true, true, spd)){
                     x -= spd;
+                    if(x < target.x * Maps.TILE_SIZE){
+                    x = target.x * Maps.TILE_SIZE;
+                    }
                 }
-                if (y < target.y * Maps.TILE_SIZE && !isCollidingWithOtherEnemy(getX(), (int) (this.getAccurateY() + spd))){
+                if (y < target.y * Maps.TILE_SIZE && canMove(x, y, false, false, spd)){
                     y += spd;
-                } else if (y > target.y * Maps.TILE_SIZE && !isCollidingWithOtherEnemy(getX(), (int) (this.getAccurateY() - spd))){
+                    if(y > target.y * Maps.TILE_SIZE){
+                    y = target.y * Maps.TILE_SIZE;
+                    }
+                } else if (y > target.y * Maps.TILE_SIZE && canMove(x, y, false, true, spd)){
                     y -= spd;
+                    if(y < target.y * Maps.TILE_SIZE){
+                    y = target.y * Maps.TILE_SIZE;
+                    }
                 }
                 if (x == target.x * Maps.TILE_SIZE && y == target.y * Maps.TILE_SIZE){
                     path.remove(path.size() - 1);
                 }
             }
+        }
+    }
+    
+    public void createPath(){
+        this.waitForFindPath++;
+        if (!isCollidingWithPlayer()  && canGo(getX(), getY(), Game.player.getX(), Game.player.getY(), 128)){
+            if ((waitForFindPath > 30 || path == null || path.size() == 0)){
+                Vector2i start = new Vector2i((int)(x / Maps.TILE_SIZE), (int)(y / Maps.TILE_SIZE));
+                Vector2i end = new Vector2i((int)(Game.player.getXCenter() / Maps.TILE_SIZE), (int)(Game.player.getYCenter() / Maps.TILE_SIZE));
+                path = AStar.findPath(Game.maps, start, end);
+                this.waitForFindPath = 0;
+            }     
+        } else {
+            this.waitForFindPath = 0;
         }
     }
 }

@@ -25,16 +25,18 @@ public class Spider extends Enemies{
     private final int damageFix = 10, bonusRandom = 5;
     private int attackDelayMax = 60, attackDelay = 0;
     private boolean lastFrame = false;
+    private double lastX, lastY;
     
     
     public Spider(double x, double y, int width, int height) {
         super(x, y, width, height);
         setMask(2,3,12,11);
-        this.speed = 1;
+        this.speed = 0.8;
         maxHP = 20;
         HP = maxHP;
         damage = damageFix;
         isDamage = false;
+        dir = dirUp;
     }
     
     @Override
@@ -45,6 +47,8 @@ public class Spider extends Enemies{
         
         moved = false;
         
+        lastX = x;
+        lastY = y;
         
         //if is not Colliding it will try to walk
         if (!isCollidingWithPlayer()){
@@ -69,18 +73,12 @@ public class Spider extends Enemies{
             dir = dirDown;
         }*/
         
-        this.waitForFindPath++;
-        if (!isCollidingWithPlayer()){
-            if ((waitForFindPath > 30 || path == null || path.size() == 0)){
-                Vector2i start = new Vector2i((int)(x / Maps.TILE_SIZE), (int)(y / Maps.TILE_SIZE));
-                Vector2i end = new Vector2i((int)(Game.player.getXCenter() / Maps.TILE_SIZE), (int)(Game.player.getYCenter() / Maps.TILE_SIZE));
-                path = AStar.findPath(Game.maps, start, end);
-                this.waitForFindPath = 0;
-            }     
-        } else {
-            this.waitForFindPath = 0;
-        }
+        createPath();
         followPath(path, speed, 16);
+        
+        if (lastX != x || lastY != y) moved = true;
+        if (lastY > y) dir = dirUp;
+        else if (lastY < y) dir = dirDown;
         
         //movement
         if (moved){

@@ -2,9 +2,9 @@ package com.isaque.maps;
 
 import com.isaque.Entities.Entity;
 import com.isaque.Entities.Hamburguer;
+import com.isaque.Entities.SemiWall;
 import com.isaque.Entities.Spider;
 import com.isaque.Entities.Stone;
-import com.isaque.Entities.Target;
 import com.isaque.Entities.Weapon;
 import com.isaque.main.Game;
 import java.awt.Graphics;
@@ -20,7 +20,7 @@ public class Maps {
     private static int width, height;
     public static final int TILE_SIZE = 16;
     private static int level = 0;
-    private final static int maxLevel = 2;
+    private final static int maxLevel = 3;
     private String path;
     private static BufferedImage map;
    
@@ -147,7 +147,7 @@ public class Maps {
                         } case 0xFFff00ff -> {
                             //TARGET
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
-                            Target enemy = new Target(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                            SemiWall enemy = new SemiWall(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                             Game.entities.add(enemy);
                             Game.enemies.add(enemy);
                             break;

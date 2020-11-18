@@ -14,8 +14,10 @@ import com.isaque.maps.Maps;
 import com.isaque.maps.PortalCoordinates;
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -122,6 +124,9 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
       	    frame.setLocationRelativeTo(null);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setIconImage(spritesheet.getIcon());
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            Cursor c = toolkit.createCustomCursor(spritesheet.getSprite(144, 0, 16, 16), new Point(0,0), "img");
+            frame.setCursor(c);
 	    frame.setVisible(wVisible);
                 
 	}

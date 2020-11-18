@@ -64,34 +64,47 @@ public class AStar {
 				Tile tile = Maps.getTile(x+xi+((y+yi)*Maps.getWidth()));
 				if(tile == null) continue;
 				if(tile instanceof Wall) continue;
-				if(i == 0) {
-					Tile test = Maps.getTile(x+xi+1+((y+yi) * Maps.getWidth()));
-					Tile test2 = Maps.getTile(x+xi+((y+yi+1) * Maps.getWidth()));
-						if(test instanceof Wall || test2 instanceof Wall) {
-							continue;
-						}
-				}
-				else if(i == 2) {
-					Tile test = Maps.getTile(x+xi-1+((y+yi) * Maps.getWidth()));
-					Tile test2 = Maps.getTile(x+xi+((y+yi+1) * Maps.getWidth()));
-						if(test instanceof Wall || test2 instanceof Wall) {
-							continue;
-						}
-				}
-				else if(i == 6) {
-					Tile test = Maps.getTile(x+xi+((y+yi-1) * Maps.getWidth()));
-					Tile test2 = Maps.getTile(x+xi+1+((y+yi) * Maps.getWidth()));
-						if(test instanceof Wall || test2 instanceof Wall) {
-							continue;
-						}
-				}
-				else if(i == 8) {
-					Tile test = Maps.getTile(x+xi+((y+yi-1) * Maps.getWidth()));
-					Tile test2 = Maps.getTile(x+xi-1+((y+yi) * Maps.getWidth()));
-						if(test instanceof Wall || test2 instanceof Wall) {
-							continue;
-						}
-				}
+                                
+                                switch (i) {
+                                case 0:
+                                    {
+                                        Tile test = Maps.getTile(x+xi+1+((y+yi) * Maps.getWidth()));
+                                        Tile test2 = Maps.getTile(x+xi+((y+yi+1) * Maps.getWidth()));
+                                        if(test instanceof Wall || test2 instanceof Wall) {
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                case 2:
+                                    {
+                                        Tile test = Maps.getTile(x+xi-1+((y+yi) * Maps.getWidth()));
+                                        Tile test2 = Maps.getTile(x+xi+((y+yi+1) * Maps.getWidth()));
+                                        if(test instanceof Wall || test2 instanceof Wall) {
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                case 6:
+                                    {
+                                        Tile test = Maps.getTile(x+xi+((y+yi-1) * Maps.getWidth()));
+                                        Tile test2 = Maps.getTile(x+xi+1+((y+yi) * Maps.getWidth()));
+                                        if(test instanceof Wall || test2 instanceof Wall) {
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                case 8:
+                                    {
+                                        Tile test = Maps.getTile(x+xi+((y+yi-1) * Maps.getWidth()));
+                                        Tile test2 = Maps.getTile(x+xi-1+((y+yi) * Maps.getWidth()));
+                                        if(test instanceof Wall || test2 instanceof Wall) {
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                default:
+                                    break;
+                            }
 				
 				Vector2i a = new Vector2i(x+xi,y+yi);
 				double gCost = current.gCost + getDistance(current.tile,a);

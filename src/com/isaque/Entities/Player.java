@@ -155,21 +155,21 @@ public class Player extends Entity{
                 }
             }          
             //jump moviment           
-            if (jRight && Maps.isFree((int)(x + speed + 1), getY(), maskX, maskY, maskW, maskH)){ 
+            if (jRight && Maps.isFree((int)(x + speed + 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() + speed), getY())){ 
                 x+= speedJump;
                 dir = rightDir;
                 moved = true;
             }
-            else if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)) {
+            else if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() - speed), getY())) {
                 x-= speedJump;
                 dir = leftDir;
                 moved = true;
             }
-            if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)) {
+            if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() - speed))) {
                 y-= speedJump;
                 moved = true;
             }
-            else if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)) {
+            else if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() + speed))) {
                 y+= speedJump;
                 moved = true;
             }      
@@ -178,21 +178,21 @@ public class Player extends Entity{
         } else {      
             //movement            
             moved = false;        
-            if (left && Maps.isFree((int)(x - speed), getY(), maskX, maskY, maskW, maskH)) {
+            if (left && Maps.isFree((int)(x - speed), getY(), maskX, maskY, maskW, maskH) && !isCollidingWithSemiWall((int)(getAccurateX() - speed), getY())) {
                 x-= speed;
                 dir = leftDir;
                 moved = true;
             }
-            if (right && Maps.isFree((int)(x + speed), getY(), maskX, maskY, maskW, maskH)){ 
+            if (right && Maps.isFree((int)(x + speed), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int)(getAccurateX() + speed), getY())){ 
                 x+= speed;
                 dir = rightDir;
                 moved = true;
             }
-            if (up && Maps.isFree(getX(), (int)(y - speed), maskX, maskY, maskW, maskH)) {
+            if (up && Maps.isFree(getX(), (int)(y - speed), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() - speed))) {
                 y-= speed;
                 moved = true;
             }
-            if (down && Maps.isFree(getX(), (int)(y + speed), maskX, maskY, maskW, maskH)) {
+            if (down && Maps.isFree(getX(), (int)(y + speed), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() + speed))) {
                 y+= speed;
                 moved = true;
             }
@@ -338,6 +338,23 @@ public class Player extends Entity{
                 continue;
             }
         }
+    }
+    
+    public boolean isCollidingWithSemiWall (int nextX, int nextY){
+        Rectangle thisEnemyBox = new Rectangle(nextX + maskX, nextY + maskY, maskW, maskH);
+        for (int i = 0; i < Game.enemies.size(); i++){
+            Enemies e = Game.enemies.get(i);
+            if (e instanceof SemiWall){
+                    Rectangle otherEnemyBox = new Rectangle(e.getX() + e.getMaskX(), e.getY() + e.getMaskY(), e.getMaskW(), e.getMaskH());
+                if (thisEnemyBox.intersects(otherEnemyBox)){
+                    return true;
+                }
+            } else {
+                continue;
+            }
+        }
+                    
+        return false;
     }
     
     public Rectangle getPlayerBox(){

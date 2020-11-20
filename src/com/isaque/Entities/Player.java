@@ -32,7 +32,7 @@ public class Player extends Entity{
     private boolean moved = false;
     private byte frames = 0, index = 0, damageFrames = 0, jumpFrames = 0, jumpIndex = 0, nextJFrame = 0, jumpWait;
     
-    private final int maxHP = 15000;
+    private final int maxHP = 150;
     private int HP = maxHP;
     private int ammo;
     private boolean hasWeapon = false;
@@ -40,7 +40,7 @@ public class Player extends Entity{
     
     public Player(int x, int y, int width, int height) {     
         super(x, y, width, height);
-        
+        this.depth = 1;
         this.speed = 1.5;
         
         rightPlayer =  new BufferedImage[4];
@@ -96,7 +96,8 @@ public class Player extends Entity{
         //System.out.println("Jump: " + jump);
         //System.out.println("isJumping: " + isJumping);
         playerBox = new Rectangle(getX() + maskX, getY() + maskY, maskW, maskH);
-        
+        if (Game.isStarted == false) Game.isStarted = true;
+
         //Death
         if (HP <= 0) death();
         //Death
@@ -128,6 +129,7 @@ public class Player extends Entity{
                     jump = false;
                     isJumping = true;
                     z = 1;
+                    this.depth = 3;
                 }
             } 
             
@@ -155,28 +157,29 @@ public class Player extends Entity{
                 }
             }          
             //jump moviment           
+            if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() - speed), getY())) {
+                x-= speedJump;
+                dir = leftDir;
+                moved = true;
+            }
             if (jRight && Maps.isFree((int)(x + speed + 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() + speed), getY())){ 
                 x+= speedJump;
                 dir = rightDir;
                 moved = true;
             }
-            else if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() - speed), getY())) {
-                x-= speedJump;
-                dir = leftDir;
+            if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() + speed))) {
+                y+= speedJump;
                 moved = true;
             }
             if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() - speed))) {
                 y-= speedJump;
                 moved = true;
-            }
-            else if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() + speed))) {
-                y+= speedJump;
-                moved = true;
             }      
             //jump moviment
             
         } else {      
-            //movement            
+            //movement    
+            this.depth = 1;
             moved = false;        
             if (left && Maps.isFree((int)(x - speed), getY(), maskX, maskY, maskW, maskH) && !isCollidingWithSemiWall((int)(getAccurateX() - speed), getY())) {
                 x-= speed;
@@ -199,32 +202,37 @@ public class Player extends Entity{
             //movement
         
             //attack
-            if (ammo > 0 && hasWeapon){             
+            if (hasWeapon){             
                 if (mouseShoot){
+                    if (ammo > 0){
+                        ammo --;
+                        double angle = Math.atan2(mouseX - (getXCenter() - Camera.getX()), mouseY - (getYCenter() - Camera.getY()));               
                 
-                    ammo --;
-                    double angle = Math.atan2(mouseX - (getXCenter() - Camera.getX()), mouseY - (getYCenter() - Camera.getY()));               
-                
-                    double dx = Math.sin(angle);
-                    double dy = Math.cos(angle);
+                        double dx = Math.sin(angle);
+                        double dy = Math.cos(angle);
 
-                    StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, dy);
-                    Game.playerProjectiles.add(stone);       
-                    Sound.shoot.play();
-                }
-                if (ammo >= 8 && specialAttack){
-                     
-                    Sound.specialAttack.play();
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, 1.0));                
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 1.0, 0.0));
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, 0.5));
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, 0.5));
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, -0.5));
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, -0.5));
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -1.0, 0));
-                    Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, -1.0));
-                    ammo-=8;
-                
+                        StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, dy);
+                        Game.playerProjectiles.add(stone);       
+                        Sound.shoot.play();
+                    } else {
+                        Sound.noAmmo.play();
+                    }
+                } 
+                if (specialAttack){
+                    if (ammo >= 8){
+                        Sound.specialAttack.play();
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, 1.0));                
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 1.0, 0.0));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, 0.5));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, 0.5));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, -0.5));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, -0.5));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -1.0, 0));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, -1.0));
+                        ammo-=8;
+                    } else {
+                        Sound.noAmmo.play();
+                    }
                     specialAttack = false;
                 }
                 //attack
@@ -232,8 +240,8 @@ public class Player extends Entity{
         
         //animation
         if (moved){
-            frames++;
-            if (Game.isStarted == false) Game.isStarted = true;
+            
+            frames++;       
             if (frames == maxFrames){
                 frames = 0;
                 index++;
@@ -282,12 +290,15 @@ public class Player extends Entity{
         //if ()
         if (isJumping){
             if (dir == rightDir){
+                g.drawImage(SHADOW, getX() - Camera.getX(), getY() - Camera.getY(), null);
                 g.drawImage(rightPlayerJump[jumpIndex], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
             } else {
+                g.drawImage(SHADOW, getX() - Camera.getX(), getY() - Camera.getY(), null);
                 g.drawImage(leftPlayerJump[jumpIndex], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
             }                      
             return;
         }
+        g.drawImage(SMALL_SHADOW, getX() - Camera.getX(), getY() - Camera.getY() + 1, null);
         if (!isDamage){
             if (dir == rightDir){
                 g.drawImage(rightPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);

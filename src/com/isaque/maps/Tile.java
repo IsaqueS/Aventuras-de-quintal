@@ -8,6 +8,9 @@ import java.awt.image.BufferedImage;
 public class Tile {
     
     public static BufferedImage TILE_FLOOR = Game.spritesheet.getSprite(0, 0, 16, 16);
+    public static BufferedImage TILE_FLOOR_FLOWER1 = Game.spritesheet.getSprite(32, 96, 16, 16);
+    public static BufferedImage TILE_WALL_WHITH_SIGN = Game.spritesheet.getSprite(32, 112, 16, 16);
+    public static BufferedImage TILE_FLOOR_FLOWER2 = Game.spritesheet.getSprite(48, 96, 16, 16);
     public static BufferedImage TILE_WALL = Game.spritesheet.getSprite(16, 0, 16, 16);
     public static BufferedImage[] TILE_PORTAL_GRASS = {Game.spritesheet.getSprite(96, 16, 16, 16),Game.spritesheet.getSprite(96, 32, 16, 16),Game.spritesheet.getSprite(96, 48, 16, 16),Game.spritesheet.getSprite(96, 32, 16, 16)};
     

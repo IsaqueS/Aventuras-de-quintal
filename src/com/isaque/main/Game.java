@@ -27,7 +27,10 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
@@ -104,8 +107,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             maps.loadLevel();
             pause = new Pause();
             gameOver = new GameOver();
-            menu = new Menu();       
-            Sound.music.loop();
+            menu = new Menu();                   
             //load   
             addKeyListener(this);
             addMouseListener(this);
@@ -127,12 +129,12 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             Toolkit toolkit = Toolkit.getDefaultToolkit();
             Cursor c = toolkit.createCustomCursor(spritesheet.getSprite(144, 0, 16, 16), new Point(0,0), "img");
             frame.setCursor(c);
-	    frame.setVisible(wVisible);
-                
+            Sound.music.loop();	    
 	}
 	
 	public synchronized void start() {
-		thread = new Thread(this);
+		startFrame(); 
+                thread = new Thread(this);
 		thread.start();
 	}
 	
@@ -153,17 +155,13 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	
         @Override
 	public void run() {
-		
 		long lastLoopTime = System.nanoTime();
 		final long amontOfTicks = 60;
 		final long ns = 1000000000 / amontOfTicks;
 		double delta = 0;		
 		int frames = 0;
 		double timer = System.currentTimeMillis();
-                long now;                            
-                
-                startFrame();
-                requestFocus();
+                long now;                                        
 
 		while (isRunning) {
 			now = System.nanoTime();
@@ -179,12 +177,25 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                                 bs = this.getBufferStrategy();
                                 frames++;
 				delta--;
-                    
+                                /*
+                                if (!isRealease){
+                                    System.out.println("GameOver: " + isGameOver);
+                                    System.out.println("isActive: " + isActive);
+                                    System.out.println("Ready to load: " + isOnMenu);
+                                    System.out.println("Load: " + isReadyToLoad);
+                                    System.out.println("pause: " + isPaused);
+                                }
+                                */
                                 if (isActive && !isPaused()){
                                     tick();
                                     render();
                                 } else if (isReadyToLoad){                                   
                                     Game.loadGame();
+                                    try {
+                                        Save.saveLevel(Game.maps.getLevel());
+                                   } catch (IOException ex) {
+                                        Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                     Game.reload();
                                 } else if (isPaused){
                                     pause.tick();
@@ -204,6 +215,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                                         render();
                                         isLoaded = true;
                                         Game.startMenu();
+                                        frame.setVisible(wVisible);
+                                        requestFocus();
                                     }
                                 }                                
                                                  
@@ -236,7 +249,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             for (int i = 0; i < playerProjectiles.size(); i++){
                 Projectiles e = playerProjectiles.get(i);
                 e.tick();
-            }	
+            }
 	}
 	
 	public void render() {
@@ -252,7 +265,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                 g.fillRect(0, 0,WIDTH,  HEIGTH);
                     
                 maps.render(g);
-                    
+                Collections.sort(entities, Entity.entitySorter);
                 for (int i = 0; i < playerProjectiles.size(); i++){
                     Projectiles e = playerProjectiles.get(i);
                     e.render(g);
@@ -264,7 +277,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                 }
                 
                 playerUI.render(g);
-                
 		// fim do render
 		
 		g.dispose();
@@ -296,16 +308,22 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             case KeyEvent.VK_ENTER -> skip = true;
             case KeyEvent.VK_ESCAPE -> {
                 if (isRealease){
-                    isPaused = !isPaused;
-                    if (isPaused == true){
-                        isActive = false;
-                    } else {
-                        isActive = true;
+                    if (isOnMenu == true && isStarted){
+                        loadGame();
+                        player.up = false;
+                        player.down = false;
+                        player.left = false;
+                        player.right = false;
+                        menu.currentOption = 0;
+                        //System.out.println("1");
+                    } else if (!isGameOver && isStarted){
+                        startMenu();
+                        //System.out.println("2");
                     }
                 }
                 isRealease = false;
             }
-            case KeyEvent.VK_F1 -> stop();
+            //case KeyEvent.VK_F1 -> stop();
         }
         
     }
@@ -400,14 +418,19 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
     
     private boolean isPaused(){
         if (!this.isFocusOwner() && isStarted){
+            startMenu();
+            return true;
+        }
+        return false;    
+    }
+    private void startPause(){
+        if (isStarted){
             isPaused = true;
             Game.isActive = false;
             Game.isReadyToLoad = false;
             Game.isGameOver = false;
             Game.isOnMenu = false;
-            return true;
-        }
-        return false;    
+        }  
     }
     
     private static void startMenu(){
@@ -416,6 +439,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         Game.isGameOver = false;
         Game.isOnMenu = true;
         Game.isPaused = false;
+        Game.menu.isStarted = false;
     }
     public static void startGameOver(){
         Game.isActive = false;
@@ -440,7 +464,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
     }
     public static void reload(){
             //load
-            //Thread.sleep(1000);
             portals = new ArrayList<PortalCoordinates>();           
             entities = new ArrayList<Entity>();
             enemies = new ArrayList<Enemies>();

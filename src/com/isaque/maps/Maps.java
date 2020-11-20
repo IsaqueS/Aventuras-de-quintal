@@ -20,7 +20,7 @@ public class Maps {
     private static int width, height;
     public static final int TILE_SIZE = 16;
     private static int level = 0;
-    private final static int maxLevel = 3;
+    public final static int maxLevel = 3;
     private String path;
     private static BufferedImage map;
    
@@ -105,6 +105,20 @@ public class Maps {
             level = 1;
         }
     }
+    public void setLevel(int level){
+        this.level = level;
+        if (this.level > maxLevel){
+            this.level = 1;
+        }
+    }
+    
+    public int getLevel(){
+        return level;
+    }
+    
+    public void resetLevel(){
+        level = 1;
+    }
     public static Tile getTile(int n){
         return tiles[n];
     }
@@ -144,6 +158,18 @@ public class Maps {
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
                             Game.entities.add(new Stone(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE, Entity.STONE_SPRITE));
                             break;
+                        } case 0xFFe6ffff -> {
+                            //FLOOR WHITH FLOWER BLUE
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR_FLOWER2);
+                            break;
+                        } case 0xFFffe6e6 -> {
+                            //FLOOR WHITH FLOWER RED
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR_FLOWER1);
+                            break;
+                        } case 0xFF1a1a1a -> {
+                            //FLOOR WHITH FLOWER RED
+                            tiles[xx + (yy * width)] = new Wall(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_WALL_WHITH_SIGN);
+                            break;
                         } case 0xFFff00ff -> {
                             //TARGET
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
@@ -163,7 +189,7 @@ public class Maps {
                             break;
                         } case 0xFF7f7f00 ->{
                             //portal
-                            tiles[xx + (yy * width)] = new PortalGrass(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_PORTAL_GRASS);
+                            tiles[xx + (yy * width)] = new Portal(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_PORTAL_GRASS);
                             Game.portals.add(new PortalCoordinates(xx * TILE_SIZE + (TILE_SIZE / 2), yy * TILE_SIZE + (TILE_SIZE / 2)));
                             break;
                         } case 0xFFFFFF00 -> {

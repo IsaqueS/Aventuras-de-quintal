@@ -2,13 +2,12 @@ package com.isaque.Entities;
 
 import com.isaque.main.Game;
 import com.isaque.maps.Camera;
-import com.isaque.maps.Maps;
 import com.isaque.maps.Node;
-import com.isaque.maps.Vector2i;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Comparator;
 import java.util.List;
 
 public class Entity {
@@ -17,13 +16,29 @@ public class Entity {
     public static final BufferedImage WEAPON_SPRITE = Game.spritesheet.getSprite(16*7, 0, 16, 16);
     public static final BufferedImage WEAPON_MINI_SPRITE = Game.spritesheet.getSprite(16*7, 16, 16, 16);
     public static final BufferedImage STONE_SPRITE = Game.spritesheet.getSprite(16*8, 0, 16, 16);
-    //public static final BufferedImage ENEMY_SPRITE = Game.spritesheet.getSprite(0, 16, 16, 16);
+    public static final BufferedImage SHADOW = Game.spritesheet.getSprite(16*8, 16, 16, 16);
+    public static final BufferedImage SMALL_SHADOW = Game.spritesheet.getSprite(16*9, 16, 16, 16);
     
     protected int width, height;
     protected double x, y, speed;
     protected int maskX, maskY, maskW, maskH;
     protected BufferedImage sprite;
     protected List<Node> path;
+    protected byte depth = 1;
+    
+    public static Comparator<Entity> entitySorter = new Comparator<Entity>() {
+		
+                @Override
+		public int compare(Entity e1, Entity e2) {
+                    if (e1.getDepth() > e2.getDepth()){
+                        return +1;
+                    } if (e1.getDepth() < e2.getDepth()){
+                        return -1;
+                    }
+                    return 0;
+		}
+		
+	};
     
     public Entity(double x, double y, int width, int height, BufferedImage sprite){
         this.x = x;
@@ -43,6 +58,10 @@ public class Entity {
         this.width = width;
         this.height = height;
         
+    }
+    
+    public byte getDepth(){
+        return depth;
     }
     
     public int getX(){

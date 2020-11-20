@@ -63,15 +63,15 @@ public class Enemies extends Entity{
         
         if (isX){
             if (isNegative) {
-                isFree = Maps.isFree((int)(nextX - spd - 1), (int)(nextY), this.getMaskX(), this.getMaskY(), this.getWidth(), this.getMaskH());
+                isFree = Maps.isFree((int)(nextX - spd), (int)(nextY), this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
             } else {
-                isFree = Maps.isFree((int)(nextX + spd + 1), (int)(nextY),this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
+                isFree = Maps.isFree((int)(nextX + spd), (int)(nextY),this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
             }
         } else {
             if (isNegative) {
-                isFree = Maps.isFree((int)(nextX), (int)(nextY - spd - 1), this.getMaskH(), this.getMaskY(), this.getMaskW(), this.getMaskH());
+                isFree = Maps.isFree((int)(nextX), (int)(nextY - spd), this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
             } else {
-                isFree = Maps.isFree((int)(nextX), (int)(nextY + spd + 1),this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
+                isFree = Maps.isFree((int)(nextX), (int)(nextY + spd),this.getMaskX(), this.getMaskY(), this.getMaskW(), this.getMaskH());
             }
         }
         
@@ -137,7 +137,7 @@ public class Enemies extends Entity{
        
     public void followPath(List<Node> path, double spd, double maxPathDistence){
         if (path != null){
-            if (path.size() > 0  && path.size() < maxPathDistence){
+            if (path.size() > 0  && path.size() <= maxPathDistence){
                 Vector2i target = path.get(path.size() - 1).tile;
                 if (x < target.x * Maps.TILE_SIZE && canMove(x, y, true, false, spd)){
                     x += spd;
@@ -168,9 +168,9 @@ public class Enemies extends Entity{
         }
     }
     
-    public void createPath(){
+    public void createPath(short maxDistance){
         this.waitForFindPath++;
-        if (!isCollidingWithPlayer()  && canGo(getX(), getY(), Game.player.getX(), Game.player.getY(), 128)){
+        if (!isCollidingWithPlayer()  && canGo(getX(), getY(), Game.player.getX(), Game.player.getY(), maxDistance)){
             if ((waitForFindPath > 30 || path == null || path.size() == 0)){
                 Vector2i start = new Vector2i((int)(x / Maps.TILE_SIZE), (int)(y / Maps.TILE_SIZE));
                 Vector2i end = new Vector2i((int)(Game.player.getXCenter() / Maps.TILE_SIZE), (int)(Game.player.getYCenter() / Maps.TILE_SIZE));

@@ -1,10 +1,7 @@
 package com.isaque.Entities;
 import com.isaque.main.Game;
 import com.isaque.main.Sound;
-import com.isaque.maps.AStar;
 import com.isaque.maps.Camera;
-import com.isaque.maps.Maps;
-import com.isaque.maps.Vector2i;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -14,12 +11,19 @@ public class Spider extends Enemies{
     private byte frames, index, maxIndex = 1, damageFrames;
     private final byte maxFrames = 5, maxDamageFrames = 5;
     private boolean moved = false;
-    private boolean dir;
-    private final boolean dirUp = true, dirDown = false;
+    private byte dir;
+    private static final short maxFindDistance = 144;
+    private final byte dirUp = 0, dirDown = 1, dirLeft = 2, dirRight = 3;
+    
     private static final BufferedImage[] spritesUp = {Game.spritesheet.getSprite(0, 32, 16, 16), Game.spritesheet.getSprite(16, 32, 16, 16)};
     private static final BufferedImage[] spritesDown = {Game.spritesheet.getSprite(0, 48, 16, 16), Game.spritesheet.getSprite(16, 48, 16, 16)};
     private static final BufferedImage[] spritesUpDamage = {Game.spritesheet.getSprite(0, 64, 16, 16), Game.spritesheet.getSprite(16, 64, 16, 16)};
     private static final BufferedImage[] spritesDownDamage = {Game.spritesheet.getSprite(0, 80, 16, 16), Game.spritesheet.getSprite(16, 80, 16, 16)};
+    
+    private static final BufferedImage[] spritesRight = {Game.spritesheet.getSprite(0, 112, 16, 16), Game.spritesheet.getSprite(16, 112, 16, 16)};
+    private static final BufferedImage[] spritesLeft = {Game.spritesheet.getSprite(0, 96, 16, 16), Game.spritesheet.getSprite(16, 96, 16, 16)};
+    private static final BufferedImage[] spritesRightDamage = {Game.spritesheet.getSprite(0, 144, 16, 16), Game.spritesheet.getSprite(16, 144, 16, 16)};    
+    private static final BufferedImage[] spritesLeftDamage = {Game.spritesheet.getSprite(0, 128, 16, 16), Game.spritesheet.getSprite(16, 128, 16, 16)};
     
     private byte waitForFindPath = 0;
     private final int damageFix = 10, bonusRandom = 5;
@@ -37,6 +41,7 @@ public class Spider extends Enemies{
         damage = damageFix;
         isDamage = false;
         dir = dirUp;
+        this.depth = 2;
     }
     
     @Override
@@ -73,12 +78,14 @@ public class Spider extends Enemies{
             dir = dirDown;
         }*/
         
-        createPath();
+        createPath(maxFindDistance);
         followPath(path, speed, 16);
         
         if (lastX != x || lastY != y) moved = true;
+        if (lastX > x) dir = dirRight;
+        if (lastX < x) dir = dirLeft;
         if (lastY > y) dir = dirUp;
-        else if (lastY < y) dir = dirDown;
+        if (lastY < y) dir = dirDown;
         
         //movement
         if (moved){
@@ -141,15 +148,23 @@ public class Spider extends Enemies{
         if (!isDamage){
             if (dir == dirUp){
                 g.drawImage(spritesUp[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null); 
-            } else {
+            } else if (dir == dirDown){
                 g.drawImage(spritesDown[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null); 
+            } else if(dir == dirRight){
+                g.drawImage(spritesRight[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
+            } else if (dir == dirLeft){
+                g.drawImage(spritesLeft[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
             }            
         } else {
             if (dir == dirUp){
                 g.drawImage(spritesUpDamage[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
-            } else {
-                g.drawImage(spritesDownDamage[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
-            }
+            } else if (dir == dirDown){
+                g.drawImage(spritesDownDamage[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null); 
+            } else if(dir == dirRight){
+                g.drawImage(spritesRightDamage[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
+            } else if (dir == dirLeft){
+                g.drawImage(spritesLeftDamage[index], this.getX() - Camera.getX(), this.getY() - Camera.getY(), null);
+            } 
              
         }
                

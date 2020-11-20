@@ -1,4 +1,3 @@
 Criar outros tipos de inimigo
 
-Corrigir bug de colição com algoritimo A*
 melhorar sistema de som

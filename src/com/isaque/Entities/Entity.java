@@ -18,6 +18,8 @@ public class Entity {
     public static final BufferedImage STONE_SPRITE = Game.spritesheet.getSprite(16*8, 0, 16, 16);
     public static final BufferedImage SHADOW = Game.spritesheet.getSprite(16*8, 16, 16, 16);
     public static final BufferedImage SMALL_SHADOW = Game.spritesheet.getSprite(16*9, 16, 16, 16);
+    public static final BufferedImage Key = Game.spritesheet.getSprite(48, 112, 16, 16);
+
     
     protected int width, height;
     protected double x, y, speed;

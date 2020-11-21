@@ -13,6 +13,7 @@ public class Hamburguer extends Itens{
         super(x, y, width, height, sprite);
         HP = 50;
         setMask(4,4,8,8);
+        this.depth = 1;
     }
     
     @Override

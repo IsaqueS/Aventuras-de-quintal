@@ -48,6 +48,7 @@ public class Sound {
         public static Clips pickFood = load("/sounds/PickFood.wav",1);
         public static Clips select = load("/sounds/Select.wav",1);
         public static Clips noAmmo = load("/sounds/noAmmo.wav",1);
+        public static Clips key = load("/sounds/Key.wav",1);
 
         
 	

@@ -94,7 +94,7 @@ public class Enemies extends Entity{
         return false;
     }
     
-    protected void CollidingWithProjectiles (int nextX, int nextY){
+    protected void collidingWithProjectiles (int nextX, int nextY){
         Rectangle thisEnemyBox = getEnemyBox();
         for (int i = 0; i < Game.playerProjectiles.size(); i++){
             Projectiles p = Game.playerProjectiles.get(i);

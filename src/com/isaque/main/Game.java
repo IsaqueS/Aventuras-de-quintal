@@ -18,6 +18,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -26,6 +27,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import static java.lang.System.gc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -133,7 +135,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	}
 	
 	public synchronized void start() {
-		startFrame(); 
+                startFrame(); 
                 thread = new Thread(this);
 		thread.start();
 	}
@@ -155,7 +157,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
 	
         @Override
 	public void run() {
-		long lastLoopTime = System.nanoTime();
+            try {
+                long lastLoopTime = System.nanoTime();
 		final long amontOfTicks = 60;
 		final long ns = 1000000000 / amontOfTicks;
 		double delta = 0;		
@@ -227,16 +230,19 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                                 ex.printStackTrace();
                             }
                         }
-			
+			/*
 			if (System.currentTimeMillis() - timer >= 1000) {
 				System.out.println("FPS: "+frames);
 			  	frames = 0;
 				timer+=1000;
 			}
-			
+			*/
 		}
-			stop();
-		
+		stop();
+            } catch (Exception e){
+                e.printStackTrace();
+                stop();
+            }
 	
 	}
 	
@@ -261,7 +267,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                 
 		// Rendeliza��o do jogo
 		
-                g.setColor(Color.WHITE);
+                g.setColor(new Color(77,224,247));
                 g.fillRect(0, 0,WIDTH,  HEIGTH);
                     
                 maps.render(g);
@@ -270,6 +276,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                     Projectiles e = playerProjectiles.get(i);
                     e.render(g);
                 }
+                
                 for (int i = 0; i < entities.size(); i++){
                      Entity e = entities.get(i);
                      e.render(g);
@@ -291,7 +298,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
     }
 
     @Override
-    //Evento ao apertar
     public void keyPressed(KeyEvent e) {
         //switch usando novidade do JDK 14
         switch (e.getKeyCode()){
@@ -329,7 +335,6 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
     }
 
     @Override
-    //Evento a soutar a tecla
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()){
             case KeyEvent.VK_A, KeyEvent.VK_LEFT -> player.left = false;
@@ -389,6 +394,13 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                     player.mouseShoot = true;
                     player.mouseX = (int) (e.getXOnScreen() / SCALE_W);
                     player.mouseY = (int) (e.getYOnScreen() / SCALE_H);
+                    /*
+                    menu.mouseClick = new Rectangle((int) (e.getXOnScreen() / SCALE_W) - 1, (int) ((e.getYOnScreen() / SCALE_H) - 1), 2, 2);
+                    System.out.println(menu.mouseClick);
+                    System.out.println(menu.button[0]);
+                    System.out.println(menu.button[1]);
+                    System.out.println(menu.button[2]);
+                    */
                 } 
                 case MouseEvent.BUTTON2 -> player.specialAttack = true;
                 case MouseEvent.BUTTON3 -> player.jump = true;

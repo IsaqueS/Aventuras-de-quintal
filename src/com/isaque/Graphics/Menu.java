@@ -22,10 +22,13 @@ public class Menu extends UI{
     public final int maxOptionStart = options.length - 2;
     public boolean up, down;
     public boolean isStarted = false, reset = false;
+    //public Rectangle[] button = new Rectangle[4];
+    //public Rectangle mouseClick;
     
     @Override
     public void tick(){
-        if (Game.isStarted){
+        //button();
+        if (Game.isStarted){           
             if (Game.skip == true){
             if (currentOption == 0){
                 Game.loadGame();
@@ -112,6 +115,19 @@ public class Menu extends UI{
             Sound.select.play();
         }
     }
+  
+    /*
+    private void button(){
+        for (int i = 0; i > maxOption; i++){
+            if (button[i] == null){
+                continue;
+            }
+            if (button[i].intersects(mouseClick)){
+                System.out.println("click");
+            }
+        }
+    }
+    */
     @Override
     public void render(Graphics g, BufferStrategy bs){                      
         if (!isStarted){
@@ -153,6 +169,7 @@ public class Menu extends UI{
 	g.drawImage(Game.image, 0, 0, Game.WWIDTH, Game.WHEIGTH, null);
 	bs.show();
     }
+    
     private void drawMenuOption(Graphics g, String text, int x, int y, int w, int h, Font font, int optionNumber) {
         // Get the FontMetrics
         FontMetrics metrics = g.getFontMetrics(font);
@@ -162,6 +179,10 @@ public class Menu extends UI{
         int y2 = y + ((h - metrics.getHeight()) / 2) + metrics.getAscent();
         // Set the font
         g.setFont(font);
+        
+        //this.button[optionNumber] = new Rectangle(x2 - 6, y2 - metrics.getHeight() - 1, metrics.stringWidth(text) + 101, metrics.getHeight() + 5);
+        //System.out.println(this.button[optionNumber]);
+        
         // Draw the String
         if (optionNumber == currentOption){
             g.setColor(Color.WHITE);

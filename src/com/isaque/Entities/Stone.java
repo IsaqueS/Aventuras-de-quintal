@@ -12,6 +12,7 @@ public class Stone extends Itens{
     public Stone(double x, double y, int width, int height, BufferedImage sprite) {
         super(x, y, width, height, sprite);
         setMask(4,5,8,7);
+        this.depth = 1;
     }
     @Override
     public void Collected(){

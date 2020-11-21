@@ -2,6 +2,8 @@ package com.isaque.maps;
 
 import com.isaque.Entities.Entity;
 import com.isaque.Entities.Hamburguer;
+import com.isaque.Entities.Key;
+import com.isaque.Entities.KeyWall;
 import com.isaque.Entities.SemiWall;
 import com.isaque.Entities.Spider;
 import com.isaque.Entities.Stone;
@@ -126,7 +128,6 @@ public class Maps {
     public void loadLevel(){
                
         try {
-            
             map = ImageIO.read(getClass().getResource(this.path + "map_" + level + ".png"));
             int[] pixels = new int[map.getWidth() * map.getHeight()];
             map.getRGB(0, 0, map.getWidth(), map.getHeight(), pixels, 0, map.getWidth());
@@ -176,6 +177,19 @@ public class Maps {
                             SemiWall enemy = new SemiWall(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                             Game.entities.add(enemy);
                             Game.enemies.add(enemy);
+                            break;
+                        } case 0xFFbfbf00 -> {
+                            //KEY WALL
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
+                            KeyWall enemy = new KeyWall(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE, Tile.TILE_WALL_KEY);
+                            Game.entities.add(enemy);
+                            Game.enemies.add(enemy);
+                            break;
+                        }case 0xFFe5e500 -> {
+                            //KEY
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
+                            Key key = new Key(xx * TILE_SIZE, yy * TILE_SIZE, 0, 0, Entity.Key);
+                            Game.entities.add(key);
                             break;
                         } case 0xFF00FFFF -> {
                             //HAMBURGUER

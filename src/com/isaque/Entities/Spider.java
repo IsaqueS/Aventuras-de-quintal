@@ -117,7 +117,7 @@ public class Spider extends Enemies{
             }
         }
         
-        CollidingWithProjectiles(getX(), getY());
+        collidingWithProjectiles(getX(), getY());
         
         if (isDamage){
            damageFrames++;
@@ -125,10 +125,7 @@ public class Spider extends Enemies{
                isDamage = false;
                damageFrames = 0;
            }
-        }
-        
-        
-        CollidingWithProjectiles(getX(), getY());
+        } 
         if (isDamage){
            damageFrames++;
            if (damageFrames == maxDamageFrames){

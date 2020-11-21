@@ -7,8 +7,8 @@ import java.awt.image.BufferedImage;
 
 public class SemiWall extends Enemies{
     
-    private byte frames, maxFrames = 5, index, maxIndex = 1, damageFrames, maxDamageFrames = 5;
-    private boolean moved = false;
+    private byte damageFrames, maxDamageFrames = 5;
+    //private boolean moved = false;
     private static BufferedImage[] sprites = {Game.spritesheet.getSprite(0, 16, 16, 16), Game.spritesheet.getSprite(16, 16, 16, 16)};
     //private static BufferedImage[] spritesDamage = {Game.spritesheet.getSprite(0, 32, 16, 16), Game.spritesheet.getSprite(16, 32, 16, 16)};
     
@@ -19,17 +19,18 @@ public class SemiWall extends Enemies{
     public SemiWall(double x, double y, int width, int height) {
         super(x, y, width, height);
         setMask(0,0,16,16);
-        this.speed = 0.8;
+        //this.speed = 0.8;
         maxHP = 30;
         HP = maxHP;
         //damage = damageFix;
         isDamage = false;
+        this.depth = 0;
     }
     
     @Override
     public void tick(){
 
-        moved = false;
+        //moved = false;
         
         /*
         //if is not Colliding it will try to walk
@@ -90,7 +91,7 @@ public class SemiWall extends Enemies{
         }
         */
         
-        CollidingWithProjectiles(getX(), getY());
+        collidingWithProjectiles(getX(), getY());
         if (isDamage){
            damageFrames++;
            if (damageFrames == maxDamageFrames){

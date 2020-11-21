@@ -1,5 +1,6 @@
 package com.isaque.Entities;
 
+import com.isaque.Entities.KeyWall;
 import com.isaque.main.Game;
 import com.isaque.main.Sound;
 import com.isaque.maps.Camera;
@@ -18,6 +19,7 @@ public class Player extends Entity{
     public int mouseX, mouseY;
     public final double speedJump = 2.5;
     public boolean leftDir = false, rightDir = true, dir = rightDir;
+    public boolean hasKey = false;
     private int z;
     
     private static Rectangle playerBox;
@@ -50,7 +52,7 @@ public class Player extends Entity{
         rightPlayerJump =  new BufferedImage[5];
         leftPlayerJump =  new BufferedImage[5];
         
-        setMask(3, 0, 10, 16);
+        setMask(3, 1, 10, 15);
         rightSprites: {
             rightPlayer[0] = Game.spritesheet.getSprite(32, 0, width, height);
             rightPlayer[1] = Game.spritesheet.getSprite(48, 0, width, height);
@@ -157,21 +159,21 @@ public class Player extends Entity{
                 }
             }          
             //jump moviment           
-            if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() - speed), getY())) {
+            if (jLeft && Maps.isFree((int)(x - speed - 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() - speed - 1), getY())) {
                 x-= speedJump;
                 dir = leftDir;
                 moved = true;
             }
-            if (jRight && Maps.isFree((int)(x + speed + 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() + speed), getY())){ 
+            if (jRight && Maps.isFree((int)(x + speed + 1), getY(), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall((int) (getAccurateX() + speed + 1), getY())){ 
                 x+= speedJump;
                 dir = rightDir;
                 moved = true;
             }
-            if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() + speed))) {
+            if (jDown && Maps.isFree(getX(), (int)(y + speed + 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() + speed + 1))) {
                 y+= speedJump;
                 moved = true;
             }
-            if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() - speed))) {
+            if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() - speed - 1))) {
                 y-= speedJump;
                 moved = true;
             }      
@@ -289,24 +291,34 @@ public class Player extends Entity{
     public void render(Graphics g){
         //if ()
         if (isJumping){
+            g.drawImage(SHADOW, getX() - Camera.getX(), getY() - Camera.getY(), null);
             if (dir == rightDir){
-                g.drawImage(SHADOW, getX() - Camera.getX(), getY() - Camera.getY(), null);
                 g.drawImage(rightPlayerJump[jumpIndex], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
             } else {
-                g.drawImage(SHADOW, getX() - Camera.getX(), getY() - Camera.getY(), null);
                 g.drawImage(leftPlayerJump[jumpIndex], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
             }                      
             return;
         }
         g.drawImage(SMALL_SHADOW, getX() - Camera.getX(), getY() - Camera.getY() + 1, null);
+        /*
+        if (hasKey){
+            g.drawImage(Entity.Key, getX() - Camera.getX() - 3, getY() - Camera.getY(), null);
+        }*/
+        
         if (!isDamage){
             if (dir == rightDir){
-                g.drawImage(rightPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
+                if (hasKey){
+                    g.drawImage(Entity.Key, getX() - Camera.getX() - 3, getY() - Camera.getY(), null);
+                } 
+                g.drawImage(rightPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);                
                 if (hasWeapon){
                     g.drawImage(Entity.WEAPON_MINI_SPRITE, getX() + 6 - Camera.getX(), getY() +2 - Camera.getY() -z, null);
                 }
             } 
             if (dir == leftDir){
+                if (hasKey){
+                    g.drawImage(Entity.Key, getX() - Camera.getX() +3, getY() - Camera.getY(), null);
+                }
                 g.drawImage(leftPlayer[index], (int)this.getX() - Camera.getX(), (int)this.getY() - Camera.getY() -z, null);
                 if (hasWeapon){
                     g.drawImage(Entity.WEAPON_MINI_SPRITE, getX() - 6 - Camera.getX(), getY() +2 - Camera.getY() -z, null);
@@ -344,6 +356,9 @@ public class Player extends Entity{
                 } else if (iten instanceof Stone && isColliding(this, iten)){                    
                     iten.Collected();
                     Game.entities.remove(i);
+                } else if (iten instanceof Key && isColliding(this, iten)){                    
+                    iten.Collected();
+                    Game.entities.remove(i);
                 }
             } else {
                 continue;
@@ -356,18 +371,25 @@ public class Player extends Entity{
         for (int i = 0; i < Game.enemies.size(); i++){
             Enemies e = Game.enemies.get(i);
             if (e instanceof SemiWall){
-                    Rectangle otherEnemyBox = new Rectangle(e.getX() + e.getMaskX(), e.getY() + e.getMaskY(), e.getMaskW(), e.getMaskH());
+                Rectangle otherEnemyBox = new Rectangle(e.getX() + e.getMaskX(), e.getY() + e.getMaskY(), e.getMaskW(), e.getMaskH());
                 if (thisEnemyBox.intersects(otherEnemyBox)){
+                    return true;
+                }
+            } else if(e instanceof KeyWall){
+                Rectangle otherEnemyBox = new Rectangle(e.getX() + e.getMaskX(), e.getY() + e.getMaskY(), e.getMaskW(), e.getMaskH());
+                if (thisEnemyBox.intersects(otherEnemyBox)){
+                    if (Game.player.hasKey){
+                        e.dead();
+                        return false;
+                    }
                     return true;
                 }
             } else {
                 continue;
-            }
+            }                 
         }
-                    
         return false;
     }
-    
     public Rectangle getPlayerBox(){
         return playerBox;
     }

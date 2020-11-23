@@ -115,15 +115,7 @@ public class Player extends Entity{
                 jUp = up;
                 jDown = down;               
                 jumpWait = 0;
-                if (jUp == false && jDown == false && jLeft == false && jRight == false){
-                    isJumping = false;
-                    //index = 0;
-                }
-                else if (jUp == true && jDown == true && jLeft == false && jRight == false){
-                    isJumping = false;
-                    //index = 0;
-                }
-                else if (jLeft == true && jRight == true && jUp == false && jDown == false ){
+                if ((jUp && jDown) ^ (jLeft && jRight)){
                     isJumping = false;
                     //index = 0;
                 } else {

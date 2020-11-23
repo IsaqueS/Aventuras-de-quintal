@@ -22,7 +22,7 @@ public class Maps {
     private static int width, height;
     public static final int TILE_SIZE = 16;
     private static int level = 0;
-    public final static int maxLevel = 3;
+    public final static int maxLevel = 4;
     private String path;
     private static BufferedImage map;
    
@@ -159,6 +159,10 @@ public class Maps {
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
                             Game.entities.add(new Stone(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE, Entity.STONE_SPRITE));
                             break;
+                        } case 0xFF001a00 -> {
+                            //WALL WHITH PLANT
+                            tiles[xx + (yy * width)] = new Wall(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_WALL_PLANT);
+                            break;
                         } case 0xFFe6ffff -> {
                             //FLOOR WHITH FLOWER BLUE
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR_FLOWER2);
@@ -167,11 +171,23 @@ public class Maps {
                             //FLOOR WHITH FLOWER RED
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR_FLOWER1);
                             break;
+                        } case 0xFFffcccc -> {
+                            //FLOOR WHITH MUSHROOM1
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR_MUSHROOM2);
+                            break;
+                        } case 0xFFcccc59 -> {
+                            //FLOOR WHITH MUSHROOM1
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR_MUSHROOM1);
+                            break;
                         } case 0xFF1a1a1a -> {
-                            //FLOOR WHITH FLOWER RED
+                            //WALL WHITH SIGN 1
                             tiles[xx + (yy * width)] = new Wall(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_WALL_WHITH_SIGN);
                             break;
-                        } case 0xFFff00ff -> {
+                        } case 0xFF1a1a00 -> {
+                            //WALL WHITH SIGN 1
+                            tiles[xx + (yy * width)] = new Wall(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_WALL_WHITH_SIGN2);
+                            break;
+                        }case 0xFFff00ff -> {
                             //TARGET
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
                             SemiWall enemy = new SemiWall(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE);

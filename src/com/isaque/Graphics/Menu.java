@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 public class Menu extends UI{
     
     public String[] options = {"Continar Jogo", "Reniciar fase", "Novo jogo","Fechar"};
+    public final String[] labels = {"Jogo feito por: Isaque Sebold", "Musica: the FlashBack team", "flashback.mors-games.com"};
     public int currentOption = 0;
     public final int maxOption = options.length - 1;
     public final int maxOptionStart = options.length - 2;
@@ -141,21 +142,21 @@ public class Menu extends UI{
         if (!Game.isStarted){
             drawMenuMSG(g, "Aventuras de quintal", 0, Game.WIDTH, new Font("arial", Font.PLAIN, 12));
             drawMenuOption(g,options[0], 0, -30, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 0);
-            //drawMenuOption(g,options[1], 0, 0, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 1);
             drawMenuOption(g,options[2], 0, 0, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 1);
             drawMenuOption(g,options[3], 0, 30, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 2);
+            
             //credids
             g.setFont(new Font("arial", Font.PLAIN, 10));
+            
             g.setColor(Color.black);
-            //g.drawString("Se gostar da musica por-favor vá para:", 2, Game.HEIGTH - 10);
-            g.drawString("Jogo feito por: Isaque Sebold", 2, Game.HEIGTH - 22);
-            g.drawString("Musica: the FlashBack team", 2, Game.HEIGTH - 12);
-            g.drawString("flashback.mors-games.com", 2, Game.HEIGTH -2);
+            g.drawString(labels[0], 2, Game.HEIGTH - 22);
+            g.drawString(labels[1], 2, Game.HEIGTH - 12);
+            g.drawString(labels[2], 2, Game.HEIGTH -2);
+            
             g.setColor(Color.white);
-            //g.drawString("Se gostar da musica por-favor vá para:", 2, Game.HEIGTH - 11);
-            g.drawString("flashback.mors-games.com", 2, Game.HEIGTH - 3);
-            g.drawString("Musica: the FlashBack team", 2, Game.HEIGTH - 13);
-            g.drawString("Jogo feito por: Isaque Sebold", 2, Game.HEIGTH - 23);
+            g.drawString(labels[0], 2, Game.HEIGTH - 23);
+            g.drawString(labels[1], 2, Game.HEIGTH - 13);
+            g.drawString(labels[2], 2, Game.HEIGTH - 3);
             //credids
         } else {
             drawMenuMSG(g, "Aventuras de quintal", 0, Game.WIDTH, new Font("arial", Font.PLAIN, 12));

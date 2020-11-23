@@ -1,3 +1,6 @@
 Criar outros tipos de inimigo
 
+fazer mais conteudo
+fazer mais fases
+refazer sistema de save
 melhorar sistema de som

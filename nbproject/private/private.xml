@@ -7,19 +7,16 @@
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/NetBeansProjects/Game_02/src/com/isaque/main/Game.java</file>
         </group>
         <group name="Java">
+            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/maps/Tile.java</file>
+            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Entities/KeyWall.java</file>
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/maps/Wall.java</file>
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Entities/Player.java</file>
-            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Entities/Spider.java</file>
-            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Graphics/UI.java</file>
-            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/maps/Tile.java</file>
-            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/maps/Camera.java</file>
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Entities/Entity.java</file>
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/main/Save.java</file>
-            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Graphics/GameOver.java</file>
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/maps/Maps.java</file>
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Graphics/Menu.java</file>
             <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/main/Game.java</file>
-            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/maps/Portal.java</file>
+            <file>file:/C:/Users/isaqu/OneDrive/Documentos/Projetos/Java/Game_02/src/com/isaque/Graphics/UI.java</file>
         </group>
     </open-files>
 </project-private>

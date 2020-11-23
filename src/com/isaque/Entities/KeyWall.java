@@ -34,6 +34,7 @@ public class KeyWall extends Enemies{
             Rectangle projectileBox = new Rectangle(p.getX(), p.getY(), width, height);
             if (thisEnemyBox.intersects(projectileBox)){
                 Game.playerProjectiles.remove(p);
+                Sound.hitt.play();
                 return;
             }
         }

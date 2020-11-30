@@ -36,6 +36,21 @@ public class Sound {
 			if(clips == null) return;
 			clips[p].loop(Clip.LOOP_CONTINUOUSLY);
 		}
+                
+                public void pause(){
+                    clips[p].stop();
+                }
+                
+                public void resume(){
+                    clips[p].start();
+                }
+                public void resumeLoop(){
+                    clips[p].loop(Clip.LOOP_CONTINUOUSLY);
+                }
+                public void resetLoop(){
+                    clips[p].setFramePosition(0);
+                    clips[p].loop(Clip.LOOP_CONTINUOUSLY);
+                }
 	}
 	
 	public static Clips music = load("/sounds/Music.wav",1);

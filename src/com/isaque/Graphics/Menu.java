@@ -34,10 +34,12 @@ public class Menu extends UI{
             if (currentOption == 0){
                 Game.loadGame();
                 currentOption = 0;
+                Sound.music.resumeLoop();
             }  
             if (currentOption == 1){
                 Game.reload();
                 currentOption = 0;
+                Sound.music.resetLoop();
              }
              if (currentOption == 2){
                 Game.maps.resetLevel();
@@ -49,6 +51,7 @@ public class Menu extends UI{
                 }
                 //this.isStarted = false;
                 currentOption = 0;
+                Sound.music.resetLoop();
             }
             if (currentOption == 3){
                 try {
@@ -59,7 +62,7 @@ public class Menu extends UI{
                 Game.stop();
                 //this.isStarted = false;
                 currentOption = 0;
-            }   
+            }
         }
         } else {
             if (Game.skip == true){

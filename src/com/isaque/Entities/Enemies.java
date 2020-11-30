@@ -98,7 +98,7 @@ public class Enemies extends Entity{
         Rectangle thisEnemyBox = getEnemyBox();
         for (int i = 0; i < Game.playerProjectiles.size(); i++){
             Projectiles p = Game.playerProjectiles.get(i);
-            Rectangle projectileBox = new Rectangle(p.getX(), p.getY(), width, height);
+            Rectangle projectileBox = new Rectangle(p.getX(), p.getY(), p.width, p.height);
             if (thisEnemyBox.intersects(projectileBox)){
                 Sound.hitt.play();
                 damageHP(p.getDamage());

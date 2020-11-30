@@ -18,7 +18,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -27,7 +26,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import static java.lang.System.gc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -131,7 +129,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             Toolkit toolkit = Toolkit.getDefaultToolkit();
             Cursor c = toolkit.createCustomCursor(spritesheet.getSprite(144, 0, 16, 16), new Point(0,0), "img");
             frame.setCursor(c);
-            Sound.music.loop();	    
+            Sound.music.loop();
+            //Sound.music.pause();
 	}
 	
 	public synchronized void start() {
@@ -256,6 +255,10 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                 Projectiles e = playerProjectiles.get(i);
                 e.tick();
             }
+            for (int i = 0; i < enemyProjectiles.size(); i++){
+                Projectiles e = enemyProjectiles.get(i);
+                e.tick();
+            }
 	}
 	
 	public void render() {
@@ -275,6 +278,12 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                 for (int i = 0; i < playerProjectiles.size(); i++){
                     Projectiles e = playerProjectiles.get(i);
                     e.render(g);
+                    //e.renderCollisionBox(g, Color.yellow);
+                }
+                for (int i = 0; i < enemyProjectiles.size(); i++){
+                    Projectiles e = enemyProjectiles.get(i);
+                    e.render(g);
+                    //e.renderCollisionBox(g, Color.yellow);
                 }
                 
                 for (int i = 0; i < entities.size(); i++){
@@ -321,9 +330,11 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                         player.left = false;
                         player.right = false;
                         menu.currentOption = 0;
+                        Sound.music.resumeLoop();
                         //System.out.println("1");
                     } else if (!isGameOver && isStarted){
                         startMenu();
+                        Sound.music.pause();
                         //System.out.println("2");
                     }
                 }
@@ -431,6 +442,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
     private boolean isPaused(){
         if (!this.isFocusOwner() && isStarted){
             startMenu();
+            Sound.music.pause();
             return true;
         }
         return false;    
@@ -484,6 +496,8 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             player = new Player(0,0,16,16);
             entities.add(player);
             Game.maps.loadLevel();
+            Camera.setX(Camera.clamp(((player.getX() + 8) - (Game.WIDTH / 2)), 0, (Maps.getWidth() * 16) - Game.WIDTH));
+            Camera.setY(Camera.clamp(((player.getY() + 8) - (Game.HEIGTH / 2)), 0, (Maps.getHeight() * 16) - Game.HEIGTH));
             //load   
     }
 }

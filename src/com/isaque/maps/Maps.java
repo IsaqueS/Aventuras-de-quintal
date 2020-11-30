@@ -5,6 +5,7 @@ import com.isaque.Entities.Hamburguer;
 import com.isaque.Entities.Key;
 import com.isaque.Entities.KeyWall;
 import com.isaque.Entities.SemiWall;
+import com.isaque.Entities.Shooter;
 import com.isaque.Entities.Spider;
 import com.isaque.Entities.Stone;
 import com.isaque.Entities.Weapon;
@@ -154,7 +155,14 @@ public class Maps {
                             Game.entities.add(enemy);
                             Game.enemies.add(enemy);
                             break;
-                        } case 0xFF0000FF -> {
+                        } case 0xFFff8080 -> {
+                            //SPIDER
+                            tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
+                            Shooter enemy = new Shooter(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE, Tile.TILE_WALL_KEY);
+                            Game.entities.add(enemy);
+                            Game.enemies.add(enemy);
+                            break;
+                        }case 0xFF0000FF -> {
                             //STONE
                             tiles[xx + (yy * width)] = new Floor(xx * TILE_SIZE, yy * TILE_SIZE, Tile.TILE_FLOOR);
                             Game.entities.add(new Stone(xx * TILE_SIZE, yy * TILE_SIZE, TILE_SIZE, TILE_SIZE, Entity.STONE_SPRITE));

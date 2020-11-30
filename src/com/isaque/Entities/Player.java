@@ -20,7 +20,7 @@ public class Player extends Entity{
     public final double speedJump = 2.5;
     public boolean leftDir = false, rightDir = true, dir = rightDir;
     public boolean hasKey = false;
-    private int z;
+    private int z, damage = 10;
     
     private static Rectangle playerBox;
     private final BufferedImage[] rightPlayer;
@@ -34,7 +34,7 @@ public class Player extends Entity{
     private boolean moved = false;
     private byte frames = 0, index = 0, damageFrames = 0, jumpFrames = 0, jumpIndex = 0, nextJFrame = 0, jumpWait;
     
-    private final int maxHP = 150;
+    private final int maxHP = 150, bonusDamage = 5;
     private int HP = maxHP;
     private int ammo;
     private boolean hasWeapon = false;
@@ -115,7 +115,15 @@ public class Player extends Entity{
                 jUp = up;
                 jDown = down;               
                 jumpWait = 0;
-                if ((jUp && jDown) ^ (jLeft && jRight)){
+                if (jUp == false && jDown == false && jLeft == false && jRight == false){
+                    isJumping = false;
+                    //index = 0;
+                }
+                else if (jUp == true && jDown == true && jLeft == false && jRight == false){
+                    isJumping = false;
+                    //index = 0;
+                }
+                else if (jUp == false && jDown == false && jLeft == false && jRight == false){
                     isJumping = false;
                     //index = 0;
                 } else {
@@ -168,13 +176,18 @@ public class Player extends Entity{
             if (jUp && Maps.isFree(getX(), (int)(y - speed - 1), maskX, maskY, maskW, maskH)&& !isCollidingWithSemiWall(getX(), (int) (getAccurateY() - speed - 1))) {
                 y-= speedJump;
                 moved = true;
-            }      
+            }
+            Camera.setX(Camera.clamp(((this.getX() + 8) - (Game.WIDTH / 2)), 0, (Maps.getWidth() * 16) - Game.WIDTH));
+            Camera.setY(Camera.clamp(((this.getY() + 8) - (Game.HEIGTH / 2)), 0, (Maps.getHeight() * 16) - Game.HEIGTH));
             //jump moviment
             
         } else {      
             //movement    
             this.depth = 1;
-            moved = false;        
+            moved = false;
+            
+            collidingWithProjectiles();
+            
             if (left && Maps.isFree((int)(x - speed), getY(), maskX, maskY, maskW, maskH) && !isCollidingWithSemiWall((int)(getAccurateX() - speed), getY())) {
                 x-= speed;
                 dir = leftDir;
@@ -205,7 +218,7 @@ public class Player extends Entity{
                         double dx = Math.sin(angle);
                         double dy = Math.cos(angle);
 
-                        StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, dy);
+                        StoneShoot stone = new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, dx, dy, damage + Game.random.nextInt(bonusDamage));
                         Game.playerProjectiles.add(stone);       
                         Sound.shoot.play();
                     } else {
@@ -215,14 +228,13 @@ public class Player extends Entity{
                 if (specialAttack){
                     if (ammo >= 8){
                         Sound.specialAttack.play();
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, 1.0));                
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 1.0, 0.0));
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, 0.5));
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, 0.5));
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, -0.5));
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, -0.5));
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -1.0, 0));
-                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, -1.0));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 1.0, 0.0, damage + Game.random.nextInt(bonusDamage)));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, 0.5, damage + Game.random.nextInt(bonusDamage)));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, 0.5, damage + Game.random.nextInt(bonusDamage)));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -0.5, -0.5, damage + Game.random.nextInt(bonusDamage)));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.5, -0.5, damage + Game.random.nextInt(bonusDamage)));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, -1.0, 0, damage + Game.random.nextInt(bonusDamage)));
+                        Game.playerProjectiles.add(new StoneShoot(getXCenter() - 1, getYCenter() - 1, 3, 3, 0.0, -1.0, damage + Game.random.nextInt(bonusDamage)));
                         ammo-=8;
                     } else {
                         Sound.noAmmo.play();
@@ -234,7 +246,8 @@ public class Player extends Entity{
         
         //animation
         if (moved){
-            
+            Camera.setX(Camera.clamp(((this.getX() + 8) - (Game.WIDTH / 2)), 0, (Maps.getWidth() * 16) - Game.WIDTH));
+            Camera.setY(Camera.clamp(((this.getY() + 8) - (Game.HEIGTH / 2)), 0, (Maps.getHeight() * 16) - Game.HEIGTH));
             frames++;       
             if (frames == maxFrames){
                 frames = 0;
@@ -260,10 +273,6 @@ public class Player extends Entity{
         
         //Others
         isCollidingWithItens();
-        
-        Camera.setX(Camera.clamp(((this.getX() + 8) - (Game.WIDTH / 2)), 0, (Maps.getWidth() * 16) - Game.WIDTH));
-        Camera.setY(Camera.clamp(((this.getY() + 8) - (Game.HEIGTH / 2)), 0, (Maps.getHeight() * 16) - Game.HEIGTH));
-        
         mouseShoot = false; 
         
         //Others
@@ -331,6 +340,21 @@ public class Player extends Entity{
                 }
             }
             
+        }
+    }
+    
+    private void collidingWithProjectiles (){
+        Rectangle playerBox = this.getPlayerBox();
+        for (int i = 0; i < Game.enemyProjectiles.size(); i++){
+            Projectiles p = Game.enemyProjectiles.get(i);
+            Rectangle projectileBox = new Rectangle(p.getX(), p.getY(), p.width, p.height);
+            if (playerBox.intersects(projectileBox)){
+                Sound.hitt.play();
+                damageHP(p.getDamage());
+                this.isDamage = true;
+                Game.enemyProjectiles.remove(p);
+                return;
+            }
         }
     }
     

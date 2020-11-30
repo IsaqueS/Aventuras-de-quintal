@@ -171,7 +171,5 @@ public class Spider extends Enemies{
     protected void dead(){
         deleteSelf();
         return;
-    }
-    
-    
+    }  
 }

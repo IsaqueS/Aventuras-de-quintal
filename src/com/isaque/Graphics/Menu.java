@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class Menu extends UI{
     
     public String[] options = {"Continar Jogo", "Reniciar fase", "Novo jogo","Fechar"};
-    public final String[] labels = {"Jogo feito por: Isaque Sebold", "Musica: the FlashBack team", "flashback.mors-games.com"};
+    public final String[] labels = {"Jogo feito por Isaque Sebold", "Musica por the FlashBack team", "flashback.mors-games.com"};
     public int currentOption = 0;
     public final int maxOption = options.length - 1;
     public final int maxOptionStart = options.length - 2;
@@ -143,13 +143,13 @@ public class Menu extends UI{
             g2 = null;
         }
         if (!Game.isStarted){
-            drawMenuMSG(g, "Aventuras de quintal", 0, Game.WIDTH, new Font("arial", Font.PLAIN, 12));
-            drawMenuOption(g,options[0], 0, -30, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 0);
-            drawMenuOption(g,options[2], 0, 0, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 1);
-            drawMenuOption(g,options[3], 0, 30, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 2);
+            drawMenuMSG(g, "Aventuras de quintal", 0, Game.WIDTH, Game.font);
+            drawMenuOption(g,options[0], 0, -30, Game.WIDTH, Game.HEIGTH, Game.font, 0);
+            drawMenuOption(g,options[2], 0, 0, Game.WIDTH, Game.HEIGTH, Game.font, 1);
+            drawMenuOption(g,options[3], 0, 30, Game.WIDTH, Game.HEIGTH, Game.font, 2);
             
             //credids
-            g.setFont(new Font("arial", Font.PLAIN, 10));
+            g.setFont(Game.font2.deriveFont(Font.PLAIN, 14));
             
             g.setColor(Color.black);
             g.drawString(labels[0], 2, Game.HEIGTH - 22);
@@ -162,11 +162,11 @@ public class Menu extends UI{
             g.drawString(labels[2], 2, Game.HEIGTH - 3);
             //credids
         } else {
-            drawMenuMSG(g, "Aventuras de quintal", 0, Game.WIDTH, new Font("arial", Font.PLAIN, 12));
-            drawMenuOption(g,options[0], 0, -30, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 0);
-            drawMenuOption(g,options[1], 0, 0, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 1);
-            drawMenuOption(g,options[2], 0, 30, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 2);
-            drawMenuOption(g,options[3], 0, 60, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.PLAIN, 10), 3);
+            drawMenuMSG(g, "Aventuras de quintal", 0, Game.WIDTH, Game.font);
+            drawMenuOption(g,options[0], 0, -30, Game.WIDTH, Game.HEIGTH, Game.font, 0);
+            drawMenuOption(g,options[1], 0, 0, Game.WIDTH, Game.HEIGTH, Game.font, 1);
+            drawMenuOption(g,options[2], 0, 30, Game.WIDTH, Game.HEIGTH, Game.font, 2);
+            drawMenuOption(g,options[3], 0, 60, Game.WIDTH, Game.HEIGTH, Game.font, 3);
         }
         g.dispose();
 	g = bs.getDrawGraphics();

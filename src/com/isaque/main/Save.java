@@ -17,9 +17,13 @@ public class Save {
     private static boolean isStarted = false;
     
     private static void startSave(){
+        //System.out.println(userSystem);
+        //System.out.println(System.getProperty("user.home"));
         if (!isStarted){
             if ("Windows 10".equals(userSystem) || "Windows 8".equals(userSystem) || "Windows 8.1".equals(userSystem)){
                 dir = System.getProperty("user.home") + "\\AppData\\Local\\AventurasDeQuintal\\";
+            } else if ("Linux".equals(userSystem)){
+                dir = System.getProperty("user.home") + "\\Documents\\.AventurasDeQuintal\\";
             } else {
                 dir = System.getProperty("user.home") + "\\.AventurasDeQuintal\\";
             }

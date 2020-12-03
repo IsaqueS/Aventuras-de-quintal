@@ -1,7 +1,6 @@
 package com.isaque.Graphics;
 
 import com.isaque.main.Game;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
@@ -9,7 +8,7 @@ import java.awt.image.BufferStrategy;
 public class GameOver extends UI{   
     
     public void render(Graphics g, BufferStrategy bs){              
-        drawCenterMSG(g, "Game Over - Enter para Continuar", 0,0, Game.WIDTH, Game.HEIGTH, new Font("arial", Font.BOLD, 9));
+        drawCenterMSG(g, "Game Over - Enter para Continuar", 0,0, Game.WIDTH, Game.HEIGTH, Game.font2);
         
         g.dispose();
 	g = bs.getDrawGraphics();

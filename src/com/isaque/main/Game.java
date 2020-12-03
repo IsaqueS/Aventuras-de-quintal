@@ -16,6 +16,8 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -26,6 +28,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -61,6 +64,10 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         private byte ticksBeforeLoad = 0;
         private Graphics g;
         private BufferStrategy bs;
+        public static InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("Font.ttf");
+        public static InputStream stream2 = ClassLoader.getSystemClassLoader().getResourceAsStream("Font2.ttf");
+        public static Font font; 
+        public static Font font2; 
         
 	private Thread thread;	
 	private static boolean isRunning = true;	
@@ -99,7 +106,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             enemies = new ArrayList<Enemies>();
             playerProjectiles = new ArrayList<Projectiles>();
             enemyProjectiles = new ArrayList<Projectiles>();
-            spritesheet = new SpriteSheet("/textures/SpriteSheet.png", "/textures/icon.png"); 
+            spritesheet = new SpriteSheet("/textures/SpriteSheet.png", "/textures/icon.png", "/textures/Mouse.png"); 
             player = new Player(0,0,16,16);
             entities.add(player);
             playerUI = new PlayerUI();
@@ -111,7 +118,15 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             //load   
             addKeyListener(this);
             addMouseListener(this);
-            //setPreferredSize(new Dimension(WIDTH * SCALE, HEIGTH * SCALE));
+            try {
+                //setPreferredSize(new Dimension(WIDTH * SCALE, HEIGTH * SCALE));
+                font = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(Font.PLAIN, 12);
+                font2 = Font.createFont(Font.TRUETYPE_FONT, stream2).deriveFont(Font.PLAIN, 12);
+            } catch (FontFormatException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
 	}
 	
@@ -127,7 +142,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setIconImage(spritesheet.getIcon());
             Toolkit toolkit = Toolkit.getDefaultToolkit();
-            Cursor c = toolkit.createCustomCursor(spritesheet.getSprite(144, 0, 16, 16), new Point(0,0), "img");
+            Cursor c = toolkit.createCustomCursor(spritesheet.getMouse(), new Point(0,0), "img");
             frame.setCursor(c);
             Sound.music.loop();
             //Sound.music.pause();
@@ -335,6 +350,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
                     } else if (!isGameOver && isStarted){
                         startMenu();
                         Sound.music.pause();
+                        Sound.select.play();
                         //System.out.println("2");
                     }
                 }
@@ -443,6 +459,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         if (!this.isFocusOwner() && isStarted){
             startMenu();
             Sound.music.pause();
+            Sound.select.play();
             return true;
         }
         return false;    
@@ -486,6 +503,7 @@ public class Game extends Canvas implements Runnable, KeyListener, MouseListener
         Game.isOnMenu = false;
         Game.isPaused = false;
     }
+    
     public static void reload(){
             //load
             portals = new ArrayList<PortalCoordinates>();           

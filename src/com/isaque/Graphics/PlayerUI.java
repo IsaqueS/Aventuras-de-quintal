@@ -32,8 +32,8 @@ public class PlayerUI {
             g.setColor(life);
             g.fillRect(barX, barY,(int) ((Game.player.getHP() / barMultipliyer)), maxBarSize);
             g.setColor(Color.WHITE);
-            g.setFont(new Font("arial", Font.BOLD, 8));
-            g.drawString("VIDA: " + Game.player.getHP() + " / " + Game.player.getMaxHP(), barX + 2, barY + 8);
+            g.setFont(Game.font2);
+            g.drawString("VIDA: " + Game.player.getHP() + " / " + Game.player.getMaxHP(), barX + 1, barY + 8);
             renderIten(g);        
         }
 

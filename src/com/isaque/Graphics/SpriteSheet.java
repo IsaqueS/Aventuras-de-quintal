@@ -11,11 +11,13 @@ public class SpriteSheet {
     
     private BufferedImage spritesheet;
     private BufferedImage icon;
+    private BufferedImage mouse;
     
-    public SpriteSheet(String pathSprite, String pathIcon){
+    public SpriteSheet(String pathSprite, String pathIcon, String pathMouse){
         try {
             spritesheet = ImageIO.read(getClass().getResource(pathSprite));
             icon = ImageIO.read(getClass().getResource(pathIcon));
+            mouse = ImageIO.read(getClass().getResource(pathMouse));
         } catch (IOException ex) {
             Logger.getLogger(SpriteSheet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -27,5 +29,8 @@ public class SpriteSheet {
     
     public BufferedImage getIcon(){
         return icon;
-    }            
+    }       
+    public BufferedImage getMouse(){
+        return mouse;
+    }
 }
